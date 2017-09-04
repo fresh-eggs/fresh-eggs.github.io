@@ -1,0 +1,306 @@
+<!doctype html>
+<!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if (IE 7)&!(IEMobile)]><html class="no-js lt-ie9 lt-ie8" lang="en"><![endif]-->
+<!--[if (IE 8)&!(IEMobile)]><html class="no-js lt-ie9" lang="en"><![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"><!--<![endif]-->
+<head>
+<meta charset="utf-8">
+<title>Busting Android File Transfer Apps. &#8211; think_tank_sec</title>
+<meta name="description" content="mostly planetary things.">
+<meta name="keywords" content="android, superbeam, exploit, reversing, planets.">
+
+
+
+<!-- Open Graph -->
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Busting Android File Transfer Apps.">
+<meta property="og:description" content="mostly planetary things.">
+<meta property="og:url" content="/2017/08/18/super_beam.html">
+<meta property="og:site_name" content="think_tank_sec">
+
+
+
+
+
+<link rel="canonical" href="/2017/08/18/super_beam.html">
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="think_tank_sec Feed">
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<!-- Webfonts -->
+<link href="//fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic" rel="stylesheet" type="text/css">
+
+<meta http-equiv="cleartype" content="on">
+
+<!-- Load Modernizr -->
+<script src="/assets/js/vendor/modernizr-2.6.2.custom.min.js"></script>
+
+<!-- Icons -->
+<!-- 16x16 -->
+<link rel="shortcut icon" href="/favicon.ico">
+<!-- 32x32 -->
+<link rel="shortcut icon" href="/favicon.png">
+<!-- 57x57 (precomposed) for iPhone 3GS, pre-2011 iPod Touch and older Android devices -->
+<link rel="apple-touch-icon-precomposed" href="/images/apple-touch-icon-precomposed.png">
+<!-- 72x72 (precomposed) for 1st generation iPad, iPad 2 and iPad mini -->
+<link rel="apple-touch-icon-precomposed" sizes="72x72" href="/images/apple-touch-icon-72x72-precomposed.png">
+<!-- 114x114 (precomposed) for iPhone 4, 4S, 5 and post-2011 iPod Touch -->
+<link rel="apple-touch-icon-precomposed" sizes="114x114" href="/images/apple-touch-icon-114x114-precomposed.png">
+<!-- 144x144 (precomposed) for iPad 3rd and 4th generation -->
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="/images/apple-touch-icon-144x144-precomposed.png">
+
+
+
+</head>
+
+<body id="post" >
+
+<!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
+<nav id="dl-menu" class="dl-menuwrapper" role="navigation">
+	<button class="dl-trigger">Open Menu</button>
+	<ul class="dl-menu">
+		<li><a href="/">Home</a></li>
+		<li>
+			<a href="#">About</a>
+			<ul class="dl-submenu">
+				<li>
+					<img src="/images/think_tank_sec.png" alt="Zack photo" class="author-photo">
+					<h4>Zack</h4>
+					<p>flipping bits since 93'</p>
+				</li>
+				<li><a href="/about/"><span class="btn btn-inverse">Learn More</span></a></li>
+				<li>
+					<a href="mailto:zack.linearlabs@gmail.com"><i class="fa fa-fw fa-envelope"></i> Email</a>
+				</li>
+				
+				
+				
+				
+				
+				
+				
+				
+				
+			</ul><!-- /.dl-submenu -->
+		</li>
+		<li>
+			<a href="#">Posts</a>
+			<ul class="dl-submenu">
+				<li><a href="/posts/">All Posts</a></li>
+				<li><a href="/tags/">All Tags</a></li>
+			</ul>
+		</li>
+		
+	</ul><!-- /.dl-menu -->
+</nav><!-- /.dl-menuwrapper -->
+
+
+
+
+<div id="main" role="main">
+  <article class="hentry">
+    <header class="header-title">
+      <div class="header-title-wrap">
+        
+          <h1 class="entry-title"><a href="/2017/08/18/super_beam.html" rel="bookmark" title="Busting Android File Transfer Apps.">Busting Android File Transfer Apps.</a></h1>
+        
+        <h2><span class="entry-date date published"><time datetime="2017-08-18T00:00:00-04:00">August 18, 2017</time></span></h2>
+        
+        <p class="entry-reading-time">
+          <i class="fa fa-clock-o"></i>
+          
+Reading time ~5 minutes
+        </p><!-- /.entry-reading-time -->
+        
+      </div><!-- /.header-title-wrap -->
+    </header>
+    <div class="entry-content">
+      <h2 id="summary">Summary</h2>
+
+<p>SuperBeam is an an excellent file transfer application which enables users from iOS, Android and even PC to seamlessly transfer files through WiFi direct, over a local LAN or via NFC.</p>
+
+<p>With over 10 PB of file transfers since its creation and well over 10 million downloads, it is certainly a mainstay in the file transfer market.</p>
+
+<p>LinearLabs has uncovered a few flaws within the file transfer process that enable a properly positioned attacker to spoof the sender. Coupled with no data validation, an attacker has the ability to arbitrarily inject files, an APK of their choice, or even replace an existing APK on the target device with a malicious one.</p>
+
+<p><br /><br /></p>
+<h2 id="affected-products">Affected Products</h2>
+
+<p>Versions of SuperBeam / WiFi Direct Share &lt;= 4.1.3</p>
+
+<p><br /><br /></p>
+<h2 id="impact">Impact</h2>
+
+<p>Since SuperBeam provides no authentication or data validation, coupled with the file transfer process turning the sender’s device into a temporary HTTP server, a properly positioned attacker is able to arbitrarily inject anything from a text file to an APK onto the receivers device through a MiTM attack.</p>
+
+<p>This is accomplished by having the attacker spoof the sending device via ARP Poisoning, while simultaneously running an instance of SuperBeam, whether as an app or the PC version.</p>
+
+<p>The most significant impact appears to be in the context of users making use of SuperBeam to transfer apps. In this type of transfer, a user is inclined to install and run whatever they receive, making this a perfect scenario for the attacker to inject a malicious APK.</p>
+
+<p>What is interesting is that if the attacker attempts to replace an APK existing on the receiving device, it is treated as an update by the android package manager. Note that apps which validate their updates via code signing will mitigate this type of attack.</p>
+
+<p>Once an attacker replaces the APK, they will automatically assume all permissions granted to the application when it was installed.</p>
+
+<p><br /><br /></p>
+<h2 id="technical-details--proof-of-concept">Technical Details / Proof of Concept</h2>
+
+<h3 id="over-the-lan">Over the LAN</h3>
+
+<p>The majority of the research was performed using devices on the same LAN, although via WiFi direct, the results are no different, i.e., sender starts an HTTP server on a LAN and waits for GET requests, no data validation.</p>
+
+<p>Below we will walk through an APK injection scenario / POC. This could just as easily have been a scenario where two parties are exchanging public keys and the attackers injects their own.</p>
+
+<p>Here we see a user initiate a file transfer by selecting an app to send via SuperBeam:
+<img src="/images/figure-0.png" alt="user selecting the file they would like to transfer." />
+<br /><br /></p>
+
+<p>SuperBeam is now active and has setup a server that will provide the flashlight app APK:
+<img src="/images/figure-1.png" alt="super beam http sevrer running." />
+<br /><br /></p>
+
+<p>Here we see that the attacker has poisoned the receivers ARP cache, pretending to be the sender at 192.168.2.27:
+<img src="/images/figure-2.png" alt="dat arp." />
+<br /><br /></p>
+
+<p>The attacker can then run an instance of SuperBeam on a mobile device or a PC and offer up the content they intend to inject into the transfer:
+<img src="/images/figure-3.png" alt="PC stands for personal computer." />
+<br /><br /></p>
+
+<p><strong>NOTE</strong>: Only the pro version enables downloads to mobile from PC, <strong>inadvertently increasing the attack surface for paying customers only.</strong> Otherwise, the receiver is met with the following:
+<img src="/images/figure-4.png" alt="" />
+<br /><br /></p>
+
+<p>Next, the receiver will simply scan the QR code provided by the sender, this will issue the following requests:
+<img src="/images/figure-5.png" alt="" />
+<br /><br /></p>
+
+<p>Since we are injecting our malicious APK via the PC version of SuperBeam, we don’t offer up a jsonlist , hence the 404.</p>
+
+<p>Below are the contents of the jsonlist offered up by the sending device:
+<img src="/images/figure-6.png" alt="sweet, sweet metadata." />
+<br /><br /></p>
+
+<p>Had this scenario been weaponized, <strong>the attacker could have used the information provided by the jsonlist from the original senderto mirror the application being transferred</strong>, leaving the receiver suspecting nothing.</p>
+
+<p>On the attacker side at this point, we see the request come into our SuperBeam instance instead of the true sender’s instance:
+<img src="/images/figure-7.png" alt="dat arp." />
+<br /><br /></p>
+
+<p>The receiver will be none the wiser as there are <strong>zero data integrity checks performed on the content received</strong>:
+<img src="/images/figure-8.png" alt="what is a keyed HMAC?" />
+<br /><br /></p>
+
+<p>Finally, the user simply steps through the installation process and the device is now fully compromised:
+<img src="/images/figure-9.png" alt="we did it guise!" />
+<br /><br /></p>
+
+<p><br /><br /></p>
+<h2 id="over-wifi-direct">Over WiFi Direct</h2>
+
+<p>Due to the nature of the implementation of the WiFi Direct file transfer feature in SuperBeam, the attack described above will have no trouble functioning in a WiFi Direct transfer scenario.</p>
+
+<p>Although some extra effort will be required on the part of the attacker in order to gain access to the LAN created by SuperBeam.</p>
+
+<p>SuperBeam performs a WiFi Direct transfer with the help of a temporary wireless access point, hosted by the device sending files:
+<img src="/images/figure-10.png" alt="" />
+<br /><br /></p>
+
+<p>After experimenting with how the application sets up this temporary network, a few flaws were uncovered that make it possible for an attacker to break into the network.</p>
+
+<ul>
+  <li>
+    <p><strong>Static SSID</strong>: As seen in the figure above, the SSID for SuperBeam WiFi direct transfers all follow a similar structure. (Ex: “DIRECT-Yf-S” , DIRECT-<two random="" characters="">-S). Once set, it looks to persist even after deleting the app and reinstalling it.</two></p>
+  </li>
+  <li>
+    <p><strong>Static WPA2 Key</strong>: The temporary network makes use of an 8 character password composed of lower and upper case letters, as well as numbers (no special characters observed during the period of this audit).</p>
+  </li>
+</ul>
+
+<p>An attacker could capture a handshake between client and server, collect a hash of the key and perform an offline hash cracking attack on the 8 character password.</p>
+
+<p>Within the hour, or even minutes depending on the computational array at their disposal, the attacker could have access to the key in plain text.</p>
+
+<p>Since it is the case that the password appears to be static for all transfers, once cracked, the attacker has the ability to MiTM every instance of a WiFi Direct transfer offered by the sender in question.</p>
+
+<p><br /><br /></p>
+<h2 id="recommended-mitigations">Recommended Mitigations</h2>
+
+<p>The vulnerabilities in the current version of SuperBeam boil down to the lack of data validation and the design decision to use HTTP servers to offer the files up instead of HTTPS.</p>
+
+<p>In order to patch up SuperBeam, the following modifications are recommended:</p>
+
+<p><br /><br /></p>
+<h3 id="https">HTTPS</h3>
+
+<p>Offer up all file transfers via HTTPS in order to prevent arbitrary MiTM attacks on the file transfer process. This could be accomplished via self signed certs on the device, or by having the sender phone home to a web server that offers up the certificate.</p>
+
+<p><br /><br /></p>
+<h3 id="data-validation">Data validation</h3>
+
+<p>Using a shared secret between the sender and receiver, the files transferred could have HMACs calculated on them.</p>
+
+<p>Even if the attacker could inject their own file into the transfer, without knowledge of the shared secret, they would never be able to calculate a valid HMAC for their injected file to include in the transfer.</p>
+
+<p>SuperBeam would validate the HMAC of the file received every time a new file comes in, using the shared secret. If it is not found to be valid, a warning is shown to the user of the possibility of data tampering.</p>
+
+<p><br /><br /></p>
+<h3 id="beef-up-wifi-direct">Beef up WiFi Direct</h3>
+
+<p>It would be highly advisable to simply randomize the SSID used by the wifi direct transfer every time a new SuperBeam server starts up.</p>
+
+<p>Not only the SSID but the network key should also change every transfer. If it were randomized, even with a weak 8 character key, the cracked key would only be useful to the attacker for a single wifi direct transfer.</p>
+
+<p>This would render efforts to crack it offline for future use completely futile, as the window of opportunity is reduced to a single transfer.</p>
+
+      <footer class="entry-meta">
+        <span class="entry-tags"><a href="/tags/#android" title="Pages tagged android" class="tag"><span class="term">android</span></a><a href="/tags/#superbeam" title="Pages tagged superbeam" class="tag"><span class="term">superbeam</span></a><a href="/tags/#exploit" title="Pages tagged exploit" class="tag"><span class="term">exploit</span></a><a href="/tags/#reversing" title="Pages tagged reversing" class="tag"><span class="term">reversing</span></a><a href="/tags/#planets." title="Pages tagged planets." class="tag"><span class="term">planets.</span></a></span>
+        
+        <div class="social-share">
+  <ul class="socialcount socialcount-small inline-list">
+    <li class="facebook"><a href="https://www.facebook.com/sharer/sharer.php?u=/2017/08/18/super_beam.html" title="Share on Facebook"><span class="count"><i class="fa fa-facebook-square"></i> Like</span></a></li>
+    <li class="twitter"><a href="https://twitter.com/intent/tweet?text=/2017/08/18/super_beam.html" title="Share on Twitter"><span class="count"><i class="fa fa-twitter-square"></i> Tweet</span></a></li>
+    <li class="googleplus"><a href="https://plus.google.com/share?url=/2017/08/18/super_beam.html" title="Share on Google Plus"><span class="count"><i class="fa fa-google-plus-square"></i> +1</span></a></li>
+  </ul>
+</div><!-- /.social-share -->
+      </footer>
+    </div><!-- /.entry-content -->
+    
+    <div class="read-more">
+  
+    <div class="read-more-header">
+      <a href="/2017/08/08/dlink_hardware_hacking.html" class="read-more-btn">Read More</a>
+    </div><!-- /.read-more-header -->
+    <div class="read-more-content">
+      <h3><a href="/2017/08/08/dlink_hardware_hacking.html" title="dlink_hardware_hacking">dlink_hardware_hacking</a></h3>
+      <p>&hellip; <a href="/2017/08/08/dlink_hardware_hacking.html">Continue reading</a></p>
+    </div><!-- /.read-more-content -->
+  
+  <div class="read-more-list">
+    
+  </div><!-- /.read-more-list -->
+</div><!-- /.read-more -->
+  </article>
+</div><!-- /#main -->
+
+<div class="footer-wrapper">
+  <footer role="contentinfo">
+    <span>&copy; 2017 Zack. Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> using the <a href="https://mademistakes.com/work/hpstr-jekyll-theme/" rel="nofollow">HPSTR Theme</a>.</span>
+  </footer>
+</div><!-- /.footer-wrapper -->
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="/assets/js/vendor/jquery-1.9.1.min.js"><\/script>')</script>
+<script src="/assets/js/scripts.min.js"></script>
+
+
+
+	        
+
+</body>
+</html>
