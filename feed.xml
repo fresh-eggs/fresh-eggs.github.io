@@ -3,26 +3,9 @@
 <generator uri="http://jekyllrb.com" version="3.5.2">Jekyll</generator>
 <link href="/feed.xml" rel="self" type="application/atom+xml" />
 <link href="/" rel="alternate" type="text/html" />
-<updated>2017-09-14T21:39:01-04:00</updated>
+<updated>2017-09-14T21:42:55-04:00</updated>
 <id>/</id>
 <subtitle>mostly planetary things.</subtitle>
-<entry>
-<title>Bkpctf Unholy Reversing</title>
-<link href="/2017/09/11/BKPCTF-unholy-reversing.html" rel="alternate" type="text/html" title="Bkpctf Unholy Reversing" />
-<published>2017-09-11T00:00:00-04:00</published>
-<updated>2017-09-11T00:00:00-04:00</updated>
-<id>/2017/09/11/BKPCTF-unholy-reversing</id>
-<content type="html" xml:base="/2017/09/11/BKPCTF-unholy-reversing.html">&lt;p&gt;so, a shared library and a snippet of ruby code, lets get cracking.&lt;/p&gt;
-
-&lt;p&gt;By the look of it, the snippet of ruby is making use of a shared python object, lets crack that open with radare2.&lt;/p&gt;
-
-&lt;p&gt;with the help of ia and aaa, we see a very funny looking entry in the memory seciton:
-vaddr=0x55f3302d7db7 paddr=0x00000db7 ordinal=002 sz=620 len=619 section=.rodata type=ascii string=exec “”“\nimport struct\ne=range\nI=len\nimport sys\nF=sys.exit\nX=[[%d,%d,%d],[%d,%d,%d],[%d,%d,%d]]\nY = [[383212,38297,8201833],[382494 ,348234985,3492834886],[3842947 ,984328,38423942839]]\nn=[5034563854941868,252734795015555591,55088063485350767967,-2770438152229037,142904135684288795,-33469734302639376803,-3633507310795117,195138776204250759,-34639402662163370450]\ny=[[0,0,0],[0,0,0],[0,0,0]]\nA=[0,0,0,0,0,0,0,0,0]\nfor i in e(I(X)):\n for j in e(I(Y[0])):\n  for k in e(I(Y)):\n   y[i][j]+=X[i][k]*Y[k][j]\nc=0\nfor r in y:\n for x in r:\n  if x!=n[c]:\n   print “dang…“\n   F(47)\n  c=c+1\nprint “:)”\n”””&lt;/p&gt;
-
-&lt;p&gt;this to me seems an awful lot like code siting plaing well in memory. Lets take a peek at anything that makes reference to this memory address.&lt;/p&gt;
-</content>
-<summary>so, a shared library and a snippet of ruby code, lets get cracking.</summary>
-</entry>
 <entry>
 <title>Super_beam</title>
 <link href="/2017/08/18/super_beam.html" rel="alternate" type="text/html" title="Super_beam" />
