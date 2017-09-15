@@ -3,22 +3,39 @@
 <generator uri="http://jekyllrb.com" version="3.5.2">Jekyll</generator>
 <link href="/feed.xml" rel="self" type="application/atom+xml" />
 <link href="/" rel="alternate" type="text/html" />
-<updated>2017-09-04T15:19:11-04:00</updated>
+<updated>2017-09-14T21:39:01-04:00</updated>
 <id>/</id>
 <subtitle>mostly planetary things.</subtitle>
 <entry>
-<title>Busting Android File Transfer Apps.</title>
-<link href="/2017/08/18/super_beam.html" rel="alternate" type="text/html" title="Busting Android File Transfer Apps." />
+<title>Bkpctf Unholy Reversing</title>
+<link href="/2017/09/11/BKPCTF-unholy-reversing.html" rel="alternate" type="text/html" title="Bkpctf Unholy Reversing" />
+<published>2017-09-11T00:00:00-04:00</published>
+<updated>2017-09-11T00:00:00-04:00</updated>
+<id>/2017/09/11/BKPCTF-unholy-reversing</id>
+<content type="html" xml:base="/2017/09/11/BKPCTF-unholy-reversing.html">&lt;p&gt;so, a shared library and a snippet of ruby code, lets get cracking.&lt;/p&gt;
+
+&lt;p&gt;By the look of it, the snippet of ruby is making use of a shared python object, lets crack that open with radare2.&lt;/p&gt;
+
+&lt;p&gt;with the help of ia and aaa, we see a very funny looking entry in the memory seciton:
+vaddr=0x55f3302d7db7 paddr=0x00000db7 ordinal=002 sz=620 len=619 section=.rodata type=ascii string=exec “”“\nimport struct\ne=range\nI=len\nimport sys\nF=sys.exit\nX=[[%d,%d,%d],[%d,%d,%d],[%d,%d,%d]]\nY = [[383212,38297,8201833],[382494 ,348234985,3492834886],[3842947 ,984328,38423942839]]\nn=[5034563854941868,252734795015555591,55088063485350767967,-2770438152229037,142904135684288795,-33469734302639376803,-3633507310795117,195138776204250759,-34639402662163370450]\ny=[[0,0,0],[0,0,0],[0,0,0]]\nA=[0,0,0,0,0,0,0,0,0]\nfor i in e(I(X)):\n for j in e(I(Y[0])):\n  for k in e(I(Y)):\n   y[i][j]+=X[i][k]*Y[k][j]\nc=0\nfor r in y:\n for x in r:\n  if x!=n[c]:\n   print “dang…“\n   F(47)\n  c=c+1\nprint “:)”\n”””&lt;/p&gt;
+
+&lt;p&gt;this to me seems an awful lot like code siting plaing well in memory. Lets take a peek at anything that makes reference to this memory address.&lt;/p&gt;
+</content>
+<summary>so, a shared library and a snippet of ruby code, lets get cracking.</summary>
+</entry>
+<entry>
+<title>Super_beam</title>
+<link href="/2017/08/18/super_beam.html" rel="alternate" type="text/html" title="Super_beam" />
 <published>2017-08-18T00:00:00-04:00</published>
 <updated>2017-08-18T00:00:00-04:00</updated>
 <id>/2017/08/18/super_beam</id>
 <content type="html" xml:base="/2017/08/18/super_beam.html">&lt;h2 id=&quot;summary&quot;&gt;Summary&lt;/h2&gt;
 
-&lt;p&gt;SuperBeam is an an excellent file transfer application which enables users from iOS, Android and even PC to seamlessly transfer files through WiFi direct, over a local LAN or via NFC.&lt;/p&gt;
+&lt;p&gt;SuperBeam is an excellent file transfer application which enables users from iOS, Android and even a PC to seamlessly transfer files through WiFi direct, over a local LAN or via NFC.&lt;/p&gt;
 
 &lt;p&gt;With over 10 PB of file transfers since its creation and well over 10 million downloads, it is certainly a mainstay in the file transfer market.&lt;/p&gt;
 
-&lt;p&gt;LinearLabs has uncovered a few flaws within the file transfer process that enable a properly positioned attacker to spoof the sender. Coupled with no data validation, an attacker has the ability to arbitrarily inject files, an APK of their choice, or even replace an existing APK on the target device with a malicious one.&lt;/p&gt;
+&lt;p&gt;Playing around with it recently, we were able to spot a few flaws within the file transfer process. Given a properly placed attacker, the possibility to arbitrarily inject data into any given transfer is alive and well!&lt;/p&gt;
 
 &lt;p&gt;&lt;br /&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;h2 id=&quot;affected-products&quot;&gt;Affected Products&lt;/h2&gt;
@@ -28,15 +45,11 @@
 &lt;p&gt;&lt;br /&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;h2 id=&quot;impact&quot;&gt;Impact&lt;/h2&gt;
 
-&lt;p&gt;Since SuperBeam provides no authentication or data validation, coupled with the file transfer process turning the sender’s device into a temporary HTTP server, a properly positioned attacker is able to arbitrarily inject anything from a text file to an APK onto the receivers device through a MiTM attack.&lt;/p&gt;
+&lt;p&gt;During the file transfer process, SuperBeam will offer up the file to be transferred via an HTTP server hosted on the sending device. Any properly positioned attacker is able to arbitrarily inject anything from a text file to an APK onto the receivers’ device through a MiTM attack.&lt;/p&gt;
 
 &lt;p&gt;This is accomplished by having the attacker spoof the sending device via ARP Poisoning, while simultaneously running an instance of SuperBeam, whether as an app or the PC version.&lt;/p&gt;
 
 &lt;p&gt;The most significant impact appears to be in the context of users making use of SuperBeam to transfer apps. In this type of transfer, a user is inclined to install and run whatever they receive, making this a perfect scenario for the attacker to inject a malicious APK.&lt;/p&gt;
-
-&lt;p&gt;What is interesting is that if the attacker attempts to replace an APK existing on the receiving device, it is treated as an update by the android package manager. Note that apps which validate their updates via code signing will mitigate this type of attack.&lt;/p&gt;
-
-&lt;p&gt;Once an attacker replaces the APK, they will automatically assume all permissions granted to the application when it was installed.&lt;/p&gt;
 
 &lt;p&gt;&lt;br /&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;h2 id=&quot;technical-details--proof-of-concept&quot;&gt;Technical Details / Proof of Concept&lt;/h2&gt;
@@ -48,65 +61,65 @@
 &lt;p&gt;Below we will walk through an APK injection scenario / POC. This could just as easily have been a scenario where two parties are exchanging public keys and the attackers injects their own.&lt;/p&gt;
 
 &lt;p&gt;Here we see a user initiate a file transfer by selecting an app to send via SuperBeam:
-&lt;img src=&quot;{{ site.url }}/images/figure-0.png&quot; alt=&quot;user selecting the file they would like to transfer.&quot; /&gt;
+&lt;img src=&quot;{{site.url}}/images/figure-0.png&quot; alt=&quot;user selecting the file they would like to transfer.&quot; /&gt;
 &lt;br /&gt;&lt;br /&gt;&lt;/p&gt;
 
-&lt;p&gt;SuperBeam is now active and has setup a server that will provide the flashlight app APK:
-&lt;img src=&quot;{{ site.url }}/images/figure-1.png&quot; alt=&quot;super beam http sevrer running.&quot; /&gt;
+&lt;p&gt;SuperBeam is now active and has set up a server that will provide the flashlight app APK:
+&lt;img src=&quot;{{site.url}}/images/figure-1.png&quot; alt=&quot;super beam HTTP server running.&quot; /&gt;
 &lt;br /&gt;&lt;br /&gt;&lt;/p&gt;
 
 &lt;p&gt;Here we see that the attacker has poisoned the receivers ARP cache, pretending to be the sender at 192.168.2.27:
-&lt;img src=&quot;{{ site.url }}/images/figure-2.png&quot; alt=&quot;dat arp.&quot; /&gt;
+&lt;img src=&quot;{{site.url}}/images/figure-2.png&quot; alt=&quot;dat arp.&quot; /&gt;
 &lt;br /&gt;&lt;br /&gt;&lt;/p&gt;
 
 &lt;p&gt;The attacker can then run an instance of SuperBeam on a mobile device or a PC and offer up the content they intend to inject into the transfer:
-&lt;img src=&quot;{{ site.url }}/images/figure-3.png&quot; alt=&quot;PC stands for personal computer.&quot; /&gt;
+&lt;img src=&quot;{{site.url}}/images/figure-3.png&quot; alt=&quot;PC stands for personal computer.&quot; /&gt;
 &lt;br /&gt;&lt;br /&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;NOTE&lt;/strong&gt;: Only the pro version enables downloads to mobile from PC, &lt;strong&gt;inadvertently increasing the attack surface for paying customers only.&lt;/strong&gt; Otherwise, the receiver is met with the following:
-&lt;img src=&quot;{{ site.url }}/images/figure-4.png&quot; alt=&quot;&quot; /&gt;
+&lt;img src=&quot;{{site.url}}/images/figure-4.png&quot; alt=&quot;&quot; /&gt;
 &lt;br /&gt;&lt;br /&gt;&lt;/p&gt;
 
 &lt;p&gt;Next, the receiver will simply scan the QR code provided by the sender, this will issue the following requests:
-&lt;img src=&quot;{{ site.url }}/images/figure-5.png&quot; alt=&quot;&quot; /&gt;
+&lt;img src=&quot;{{site.url}}/images/figure-5.png&quot; alt=&quot;&quot; /&gt;
 &lt;br /&gt;&lt;br /&gt;&lt;/p&gt;
 
-&lt;p&gt;Since we are injecting our malicious APK via the PC version of SuperBeam, we don’t offer up a jsonlist , hence the 404.&lt;/p&gt;
+&lt;p&gt;Since we are injecting our malicious APK via the PC version of SuperBeam, we don’t offer up a jsonlist, hence the 404.&lt;/p&gt;
 
 &lt;p&gt;Below are the contents of the jsonlist offered up by the sending device:
-&lt;img src=&quot;{{ site.url }}/images/figure-6.png&quot; alt=&quot;sweet, sweet metadata.&quot; /&gt;
+&lt;img src=&quot;{{site.url}}/images/figure-6.png&quot; alt=&quot;sweet, sweet metadata.&quot; /&gt;
 &lt;br /&gt;&lt;br /&gt;&lt;/p&gt;
 
-&lt;p&gt;Had this scenario been weaponized, &lt;strong&gt;the attacker could have used the information provided by the jsonlist from the original senderto mirror the application being transferred&lt;/strong&gt;, leaving the receiver suspecting nothing.&lt;/p&gt;
+&lt;p&gt;Had this scenario been weaponized, &lt;strong&gt;the attacker could have used the information provided by the jsonlist from the original sender to mirror the application being transferred&lt;/strong&gt;, leaving the receiver suspecting nothing.&lt;/p&gt;
 
 &lt;p&gt;On the attacker side at this point, we see the request come into our SuperBeam instance instead of the true sender’s instance:
-&lt;img src=&quot;{{ site.url }}/images/figure-7.png&quot; alt=&quot;dat arp.&quot; /&gt;
+&lt;img src=&quot;{{site.url}}/images/figure-7.png&quot; alt=&quot;dat arp.&quot; /&gt;
 &lt;br /&gt;&lt;br /&gt;&lt;/p&gt;
 
 &lt;p&gt;The receiver will be none the wiser as there are &lt;strong&gt;zero data integrity checks performed on the content received&lt;/strong&gt;:
-&lt;img src=&quot;{{ site.url }}/images/figure-8.png&quot; alt=&quot;what is a keyed HMAC?&quot; /&gt;
+&lt;img src=&quot;{{site.url}}/images/figure-8.png&quot; alt=&quot;what is a keyed HMAC?&quot; /&gt;
 &lt;br /&gt;&lt;br /&gt;&lt;/p&gt;
 
 &lt;p&gt;Finally, the user simply steps through the installation process and the device is now fully compromised:
-&lt;img src=&quot;{{ site.url }}/images/figure-9.png&quot; alt=&quot;we did it guise!&quot; /&gt;
+&lt;img src=&quot;{{site.url}}/images/figure-9.png&quot; alt=&quot;we did it guys!&quot; /&gt;
 &lt;br /&gt;&lt;br /&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;br /&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;h2 id=&quot;over-wifi-direct&quot;&gt;Over WiFi Direct&lt;/h2&gt;
 
-&lt;p&gt;Due to the nature of the implementation of the WiFi Direct file transfer feature in SuperBeam, the attack described above will have no trouble functioning in a WiFi Direct transfer scenario.&lt;/p&gt;
+&lt;p&gt;Due to the nature of the implementation of the WiFi Direct file transfer feature in SuperBeam, the attack described above will have no trouble functioning in a WiFi Direct scenario.&lt;/p&gt;
 
 &lt;p&gt;Although some extra effort will be required on the part of the attacker in order to gain access to the LAN created by SuperBeam.&lt;/p&gt;
 
 &lt;p&gt;SuperBeam performs a WiFi Direct transfer with the help of a temporary wireless access point, hosted by the device sending files:
-&lt;img src=&quot;{{ site.url }}/images/figure-10.png&quot; alt=&quot;&quot; /&gt;
+&lt;img src=&quot;{{site.url}}/images/figure-10.png&quot; alt=&quot;&quot; /&gt;
 &lt;br /&gt;&lt;br /&gt;&lt;/p&gt;
 
 &lt;p&gt;After experimenting with how the application sets up this temporary network, a few flaws were uncovered that make it possible for an attacker to break into the network.&lt;/p&gt;
 
 &lt;ul&gt;
   &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;Static SSID&lt;/strong&gt;: As seen in the figure above, the SSID for SuperBeam WiFi direct transfers all follow a similar structure. (Ex: “DIRECT-Yf-S” , DIRECT-&lt;two random=&quot;&quot; characters=&quot;&quot;&gt;-S). Once set, it looks to persist even after deleting the app and reinstalling it.&lt;/two&gt;&lt;/p&gt;
+    &lt;p&gt;&lt;strong&gt;Static SSID&lt;/strong&gt;: As seen in the figure above, the SSID for SuperBeam WiFi direct transfers all follow a similar structure. (Ex: “DIRECT-Yf-S”, DIRECT-&lt;two random=&quot;&quot; characters=&quot;&quot;&gt;-S). Once set, it looks to persist even after deleting the app and reinstalling it.&lt;/two&gt;&lt;/p&gt;
   &lt;/li&gt;
   &lt;li&gt;
     &lt;p&gt;&lt;strong&gt;Static WPA2 Key&lt;/strong&gt;: The temporary network makes use of an 8 character password composed of lower and upper case letters, as well as numbers (no special characters observed during the period of this audit).&lt;/p&gt;
@@ -115,30 +128,28 @@
 
 &lt;p&gt;An attacker could capture a handshake between client and server, collect a hash of the key and perform an offline hash cracking attack on the 8 character password.&lt;/p&gt;
 
-&lt;p&gt;Within the hour, or even minutes depending on the computational array at their disposal, the attacker could have access to the key in plain text.&lt;/p&gt;
-
-&lt;p&gt;Since it is the case that the password appears to be static for all transfers, once cracked, the attacker has the ability to MiTM every instance of a WiFi Direct transfer offered by the sender in question.&lt;/p&gt;
+&lt;p&gt;Since it is the case that the password appears to be static for all transfers initiated by a given sender, once cracked, the attacker has the ability to MiTM every instance of a WiFi Direct transfer offered by the sender in question.&lt;/p&gt;
 
 &lt;p&gt;&lt;br /&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;h2 id=&quot;recommended-mitigations&quot;&gt;Recommended Mitigations&lt;/h2&gt;
+&lt;h2 id=&quot;recommended-mitigation&quot;&gt;Recommended Mitigation&lt;/h2&gt;
 
-&lt;p&gt;The vulnerabilities in the current version of SuperBeam boil down to the lack of data validation and the design decision to use HTTP servers to offer the files up instead of HTTPS.&lt;/p&gt;
+&lt;p&gt;The vulnerabilities in the current version of SuperBeam boil down to the lack of any form of data validation.&lt;/p&gt;
 
 &lt;p&gt;In order to patch up SuperBeam, the following modifications are recommended:&lt;/p&gt;
 
 &lt;p&gt;&lt;br /&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;h3 id=&quot;https&quot;&gt;HTTPS&lt;/h3&gt;
 
-&lt;p&gt;Offer up all file transfers via HTTPS in order to prevent arbitrary MiTM attacks on the file transfer process. This could be accomplished via self signed certs on the device, or by having the sender phone home to a web server that offers up the certificate.&lt;/p&gt;
+&lt;p&gt;Offer up all file transfers via HTTPS in order to prevent arbitrary MiTM attacks on the file transfer process.&lt;/p&gt;
 
 &lt;p&gt;&lt;br /&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;h3 id=&quot;data-validation&quot;&gt;Data validation&lt;/h3&gt;
 
 &lt;p&gt;Using a shared secret between the sender and receiver, the files transferred could have HMACs calculated on them.&lt;/p&gt;
 
-&lt;p&gt;Even if the attacker could inject their own file into the transfer, without knowledge of the shared secret, they would never be able to calculate a valid HMAC for their injected file to include in the transfer.&lt;/p&gt;
+&lt;p&gt;Even if the attacker could inject their own file into the transfer, without knowledge of the shared secret, the attacker should not be able to calculate a valid HMAC for their injected file.&lt;/p&gt;
 
-&lt;p&gt;SuperBeam would validate the HMAC of the file received every time a new file comes in, using the shared secret. If it is not found to be valid, a warning is shown to the user of the possibility of data tampering.&lt;/p&gt;
+&lt;p&gt;At the very least, this would provide SuperBeam a way to validate that the data being transferred was not tampered with.&lt;/p&gt;
 
 &lt;p&gt;&lt;br /&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;h3 id=&quot;beef-up-wifi-direct&quot;&gt;Beef up WiFi Direct&lt;/h3&gt;
@@ -149,11 +160,6 @@
 
 &lt;p&gt;This would render efforts to crack it offline for future use completely futile, as the window of opportunity is reduced to a single transfer.&lt;/p&gt;
 </content>
-<category term="android" />
-<category term="superbeam" />
-<category term="exploit" />
-<category term="reversing" />
-<category term="planets." />
-<summary>SummarySuperBeam is an an excellent file transfer application which enables users from iOS, Android and even PC to seamlessly transfer files through WiFi direct, over a local LAN or via NFC.With over 10 PB of file transfers since its creation and well over 10 million downloads, it is certainly a mainstay in the file transfer market.LinearLabs has uncovered a few flaws within the file transfer process that enable a properly positioned attacker to spoof the sender. Coupled with no data validation, an attacker has the ability to arbitrarily inject files, an APK of their choice, or even replace an existing APK on the target device with a malicious one.Affected ProductsVersions of SuperBeam / WiFi Direct Share &amp;lt;= 4.1.3ImpactSince SuperBeam provides no authentication or data validation, coupled with the file transfer process turning the sender’s device into a temporary HTTP server, a properly positioned attacker is able to arbitrarily inject anything from a text file to an APK onto the receivers device through a MiTM attack.This is accomplished by having the attacker spoof the sending device via ARP Poisoning, while simultaneously running an instance of SuperBeam, whether as an app or the PC version.The most significant impact appears to be in the context of users making use of SuperBeam to transfer apps. In this type of transfer, a user is inclined to install and run whatever they receive, making this a perfect scenario for the attacker to inject a malicious APK.What is interesting is that if the attacker attempts to replace an APK existing on the receiving device, it is treated as an update by the android package manager. Note that apps which validate their updates via code signing will mitigate this type of attack.Once an attacker replaces the APK, they will automatically assume all permissions granted to the application when it was installed.Technical Details / Proof of ConceptOver the LANThe majority of the research was performed using devices on the same LAN, although via WiFi direct, the results are no different, i.e., sender starts an HTTP server on a LAN and waits for GET requests, no data validation.Below we will walk through an APK injection scenario / POC. This could just as easily have been a scenario where two parties are exchanging public keys and the attackers injects their own.Here we see a user initiate a file transfer by selecting an app to send via SuperBeam:SuperBeam is now active and has setup a server that will provide the flashlight app APK:Here we see that the attacker has poisoned the receivers ARP cache, pretending to be the sender at 192.168.2.27:The attacker can then run an instance of SuperBeam on a mobile device or a PC and offer up the content they intend to inject into the transfer:NOTE: Only the pro version enables downloads to mobile from PC, inadvertently increasing the attack surface for paying customers only. Otherwise, the receiver is met with the following:Next, the receiver will simply scan the QR code provided by the sender, this will issue the following requests:Since we are injecting our malicious APK via the PC version of SuperBeam, we don’t offer up a jsonlist , hence the 404.Below are the contents of the jsonlist offered up by the sending device:Had this scenario been weaponized, the attacker could have used the information provided by the jsonlist from the original senderto mirror the application being transferred, leaving the receiver suspecting nothing.On the attacker side at this point, we see the request come into our SuperBeam instance instead of the true sender’s instance:The receiver will be none the wiser as there are zero data integrity checks performed on the content received:Finally, the user simply steps through the installation process and the device is now fully compromised:Over WiFi DirectDue to the nature of the implementation of the WiFi Direct file transfer feature in SuperBeam, the attack described above will have no trouble functioning in a WiFi Direct transfer scenario.Although some extra effort will be required on the part of the attacker in order to gain access to the LAN created by SuperBeam.SuperBeam performs a WiFi Direct transfer with the help of a temporary wireless access point, hosted by the device sending files:After experimenting with how the application sets up this temporary network, a few flaws were uncovered that make it possible for an attacker to break into the network.      Static SSID: As seen in the figure above, the SSID for SuperBeam WiFi direct transfers all follow a similar structure. (Ex: “DIRECT-Yf-S” , DIRECT--S). Once set, it looks to persist even after deleting the app and reinstalling it.        Static WPA2 Key: The temporary network makes use of an 8 character password composed of lower and upper case letters, as well as numbers (no special characters observed during the period of this audit).  An attacker could capture a handshake between client and server, collect a hash of the key and perform an offline hash cracking attack on the 8 character password.Within the hour, or even minutes depending on the computational array at their disposal, the attacker could have access to the key in plain text.Since it is the case that the password appears to be static for all transfers, once cracked, the attacker has the ability to MiTM every instance of a WiFi Direct transfer offered by the sender in question.Recommended MitigationsThe vulnerabilities in the current version of SuperBeam boil down to the lack of data validation and the design decision to use HTTP servers to offer the files up instead of HTTPS.In order to patch up SuperBeam, the following modifications are recommended:HTTPSOffer up all file transfers via HTTPS in order to prevent arbitrary MiTM attacks on the file transfer process. This could be accomplished via self signed certs on the device, or by having the sender phone home to a web server that offers up the certificate.Data validationUsing a shared secret between the sender and receiver, the files transferred could have HMACs calculated on them.Even if the attacker could inject their own file into the transfer, without knowledge of the shared secret, they would never be able to calculate a valid HMAC for their injected file to include in the transfer.SuperBeam would validate the HMAC of the file received every time a new file comes in, using the shared secret. If it is not found to be valid, a warning is shown to the user of the possibility of data tampering.Beef up WiFi DirectIt would be highly advisable to simply randomize the SSID used by the wifi direct transfer every time a new SuperBeam server starts up.Not only the SSID but the network key should also change every transfer. If it were randomized, even with a weak 8 character key, the cracked key would only be useful to the attacker for a single wifi direct transfer.This would render efforts to crack it offline for future use completely futile, as the window of opportunity is reduced to a single transfer.</summary>
+<summary>SummarySuperBeam is an excellent file transfer application which enables users from iOS, Android and even a PC to seamlessly transfer files through WiFi direct, over a local LAN or via NFC.With over 10 PB of file transfers since its creation and well over 10 million downloads, it is certainly a mainstay in the file transfer market.Playing around with it recently, we were able to spot a few flaws within the file transfer process. Given a properly placed attacker, the possibility to arbitrarily inject data into any given transfer is alive and well!Affected ProductsVersions of SuperBeam / WiFi Direct Share &amp;lt;= 4.1.3ImpactDuring the file transfer process, SuperBeam will offer up the file to be transferred via an HTTP server hosted on the sending device. Any properly positioned attacker is able to arbitrarily inject anything from a text file to an APK onto the receivers’ device through a MiTM attack.This is accomplished by having the attacker spoof the sending device via ARP Poisoning, while simultaneously running an instance of SuperBeam, whether as an app or the PC version.The most significant impact appears to be in the context of users making use of SuperBeam to transfer apps. In this type of transfer, a user is inclined to install and run whatever they receive, making this a perfect scenario for the attacker to inject a malicious APK.Technical Details / Proof of ConceptOver the LANThe majority of the research was performed using devices on the same LAN, although via WiFi direct, the results are no different, i.e., sender starts an HTTP server on a LAN and waits for GET requests, no data validation.Below we will walk through an APK injection scenario / POC. This could just as easily have been a scenario where two parties are exchanging public keys and the attackers injects their own.Here we see a user initiate a file transfer by selecting an app to send via SuperBeam:SuperBeam is now active and has set up a server that will provide the flashlight app APK:Here we see that the attacker has poisoned the receivers ARP cache, pretending to be the sender at 192.168.2.27:The attacker can then run an instance of SuperBeam on a mobile device or a PC and offer up the content they intend to inject into the transfer:NOTE: Only the pro version enables downloads to mobile from PC, inadvertently increasing the attack surface for paying customers only. Otherwise, the receiver is met with the following:Next, the receiver will simply scan the QR code provided by the sender, this will issue the following requests:Since we are injecting our malicious APK via the PC version of SuperBeam, we don’t offer up a jsonlist, hence the 404.Below are the contents of the jsonlist offered up by the sending device:Had this scenario been weaponized, the attacker could have used the information provided by the jsonlist from the original sender to mirror the application being transferred, leaving the receiver suspecting nothing.On the attacker side at this point, we see the request come into our SuperBeam instance instead of the true sender’s instance:The receiver will be none the wiser as there are zero data integrity checks performed on the content received:Finally, the user simply steps through the installation process and the device is now fully compromised:Over WiFi DirectDue to the nature of the implementation of the WiFi Direct file transfer feature in SuperBeam, the attack described above will have no trouble functioning in a WiFi Direct scenario.Although some extra effort will be required on the part of the attacker in order to gain access to the LAN created by SuperBeam.SuperBeam performs a WiFi Direct transfer with the help of a temporary wireless access point, hosted by the device sending files:After experimenting with how the application sets up this temporary network, a few flaws were uncovered that make it possible for an attacker to break into the network.      Static SSID: As seen in the figure above, the SSID for SuperBeam WiFi direct transfers all follow a similar structure. (Ex: “DIRECT-Yf-S”, DIRECT--S). Once set, it looks to persist even after deleting the app and reinstalling it.        Static WPA2 Key: The temporary network makes use of an 8 character password composed of lower and upper case letters, as well as numbers (no special characters observed during the period of this audit).  An attacker could capture a handshake between client and server, collect a hash of the key and perform an offline hash cracking attack on the 8 character password.Since it is the case that the password appears to be static for all transfers initiated by a given sender, once cracked, the attacker has the ability to MiTM every instance of a WiFi Direct transfer offered by the sender in question.Recommended MitigationThe vulnerabilities in the current version of SuperBeam boil down to the lack of any form of data validation.In order to patch up SuperBeam, the following modifications are recommended:HTTPSOffer up all file transfers via HTTPS in order to prevent arbitrary MiTM attacks on the file transfer process.Data validationUsing a shared secret between the sender and receiver, the files transferred could have HMACs calculated on them.Even if the attacker could inject their own file into the transfer, without knowledge of the shared secret, the attacker should not be able to calculate a valid HMAC for their injected file.At the very least, this would provide SuperBeam a way to validate that the data being transferred was not tampered with.Beef up WiFi DirectIt would be highly advisable to simply randomize the SSID used by the wifi direct transfer every time a new SuperBeam server starts up.Not only the SSID but the network key should also change every transfer. If it were randomized, even with a weak 8 character key, the cracked key would only be useful to the attacker for a single wifi direct transfer.This would render efforts to crack it offline for future use completely futile, as the window of opportunity is reduced to a single transfer.</summary>
 </entry>
 </feed>
