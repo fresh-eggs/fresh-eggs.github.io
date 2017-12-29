@@ -122,6 +122,114 @@
   <header>
     
     <div class="entry-meta">
+      <span class="entry-date date published updated"><time datetime="2017-12-29T00:00:00-05:00"><a href="/2017/12/29/x86-Series-Pointers.html">December 29, 2017</a></time></span><span class="author vcard"><span class="fn"><a href="/about/" title="About Zack">Zack</a></span></span>
+      
+      <span class="entry-reading-time">
+        <i class="fa fa-clock-o"></i>
+        
+Reading time ~1 minute
+      </span><!-- /.entry-reading-time -->
+      
+    </div><!-- /.entry-meta -->
+    
+      <h1 class="entry-title"><a href="/2017/12/29/x86-Series-Pointers.html" rel="bookmark" title="X86 Series Pointers" itemprop="url">X86 Series Pointers</a></h1>
+    
+  </header>
+  <div class="entry-content">
+    <p>This is the second installment of the x86 series where we cover the basics of assembly from a C programmers perspective.</p>
+
+<p>Today we will focus on pointers, how to identify them in assembly and how to spot the different functions of a pointer.</p>
+
+<p>First up, take a look at this simple example:</p>
+
+<p>#include <stdio.h></stdio.h></p>
+
+<p>int main(){
+	char our_char = ‘Q’;
+	char *ptr_x = &amp;our_char;</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>printf("this is your ptr_x addr: 0x%x\n", &amp;ptr_x);
+printf("this is your ptr_x value: 0x%x\n", ptr_x);
+printf("finally, here is the value it points to: %s\n", *ptr_x);
+return 0; }
+</code></pre>
+</div>
+
+<p>We can see that it makes allocates a char, passes it to a pointer, followed by printing the three different pieces that make up the pointer in question.</p>
+
+<p>Now let’s dive into some assembly!</p>
+
+
+  </div><!-- /.entry-content -->
+</article><!-- /.hentry -->
+
+<article class="hentry">
+  <header>
+    
+    <div class="entry-meta">
+      <span class="entry-date date published updated"><time datetime="2017-09-24T00:00:00-04:00"><a href="/2017/09/24/backdoor_ctf_BABY-0x41414141_writeup.html">September 24, 2017</a></time></span><span class="author vcard"><span class="fn"><a href="/about/" title="About Zack">Zack</a></span></span>
+      
+      <span class="entry-reading-time">
+        <i class="fa fa-clock-o"></i>
+        
+Reading time ~1 minute
+      </span><!-- /.entry-reading-time -->
+      
+    </div><!-- /.entry-meta -->
+    
+      <h1 class="entry-title"><a href="/2017/09/24/backdoor_ctf_BABY-0x41414141_writeup.html" rel="bookmark" title="Backdoor_ctf_baby 0x41414141_writeup" itemprop="url">Backdoor_ctf_baby 0x41414141_writeup</a></h1>
+    
+  </header>
+  <div class="entry-content">
+    <p>This past weekend I had the pleasure of participating in BackdoorCTF 2017 with the OpenToAll CTF team.</p>
+
+<p>In order to manage a 10th overall finish, a few binary reversing challenges stood in the way. While it is true that there were 3 of us working on the reversing challenges, credit goes to Kileak for absolutely smashing through these things before I had a chance to open radare2.</p>
+
+<p>None the less, here is a write up for the BABY-0x41414141 reversing challenge.</p>
+
+<p>We are presented with a binary named new_32, and along with that an ip and port to connect to with netcat. The binary we are given is hosted at that address and port so it is clear that we need to develop an exploit locally and fire it off to the remote server.</p>
+
+<p>Running new_32, we are met with a simple question and answer loop:
+1.</p>
+
+<p>With that, lets start extracting some information from the file, starting with the memory section: 
+2.</p>
+
+<p>Hmm, now that looks ultra interesting, wonder if there are references to this address anywhere in the binary:
+3.</p>
+
+<p>Bingo!</p>
+
+<p>Now that we have found the function we need to jump into, we need to get a handle on the execution flow in order to take it over, lets look at the imports to see if there is anything in use that could help us:</p>
+
+<p>Seems that fgets and printf are being used, either of these have the potential to yield us control of execution, lets start with the call to fgets:</p>
+<ol>
+  <li></li>
+</ol>
+
+<p>FGETS
+5.
+The call is responsible for collecting our name, we can see that the size of the buffer is 0xc8, and it stores our value on the stack.</p>
+
+<p>Evaluating the buffer space allocated on the stack, compared to the 0xc8(200) bytes we can pass, we quickly come to find out that we won’t be able to reach anything dangerous. NEXT!</p>
+
+<p>PRINTF
+Upon examining the call to printf, we can see that there is attacker controlled input being passed to the format string, and 0xc8 of it to boot! 
+6.</p>
+
+<p>Crash course on format string vulnerabilities for anyone interested:</p>
+
+<p>In an attempt to take over the flow of execution, we could craft a format string that will overwrite entries on the stack to return into the flag function we found earlier.</p>
+
+<p>Thats all folks, hope you learned something, until next time.</p>
+
+  </div><!-- /.entry-content -->
+</article><!-- /.hentry -->
+
+<article class="hentry">
+  <header>
+    
+    <div class="entry-meta">
       <span class="entry-date date published updated"><time datetime="2017-08-18T00:00:00-04:00"><a href="/2017/08/18/super_beam.html">August 18, 2017</a></time></span><span class="author vcard"><span class="fn"><a href="/about/" title="About Zack">Zack</a></span></span>
       
       <span class="entry-reading-time">
@@ -136,7 +244,10 @@ Reading time ~5 minutes
     
   </header>
   <div class="entry-content">
-    <h2 id="summary">Summary</h2>
+    <h2 id="edit">edit</h2>
+<p>This vulnerability has been assigned CVE-2017-17763.
+<br /></p>
+<h2 id="summary">Summary</h2>
 
 <p>SuperBeam is an excellent file transfer application which enables users from iOS, Android and even a PC to seamlessly transfer files through WiFi direct, over a local LAN or via NFC.</p>
 
