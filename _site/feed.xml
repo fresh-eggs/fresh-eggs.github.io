@@ -3,7 +3,7 @@
 <generator uri="http://jekyllrb.com" version="3.5.2">Jekyll</generator>
 <link href="/feed.xml" rel="self" type="application/atom+xml" />
 <link href="/" rel="alternate" type="text/html" />
-<updated>2018-01-06T16:13:24-05:00</updated>
+<updated>2018-01-07T12:45:45-05:00</updated>
 <id>/</id>
 <subtitle>mostly planetary things.</subtitle>
 <entry>
@@ -14,12 +14,12 @@
 <id>/2018/01/03/From-C-to-x86-:-part0x00-pointers</id>
 <content type="html" xml:base="/2018/01/03/From-C-to-x86-part0x00-pointers.html">&lt;p&gt;This is the first installment of the x86 series where we cover the basics of assembly from a C programmers perspective.&lt;/p&gt;
 
-&lt;p&gt;Today we will focus on the basics of pointers with the help of a simple C example.
-&lt;br /&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p&gt;Today we will focus on the basics of pointers with the help of a simple C example.&lt;/p&gt;
 
+&lt;p&gt;&lt;br /&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;h2 id=&quot;the-c-code&quot;&gt;The C code&lt;/h2&gt;
-&lt;div class=&quot;language-c highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;err&quot;&gt;\#&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;include&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;stdio&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;h&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
-
+&lt;div class=&quot;language-c highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;cp&quot;&gt;#include &amp;lt;stdio.h&amp;gt;
+&lt;/span&gt;
 
 &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(){&lt;/span&gt;
 	&lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;our_char&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;sc&quot;&gt;'Q'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
