@@ -180,8 +180,8 @@ Reading time ~6 minutes
 <p><br /><br /></p>
 <h2 id="assembly-breakdown">Assembly breakdown</h2>
 
-<h3 id="stack">Stack</h3>
-<p>The scope of the variable below is inside the main() function. Since we assigned it a value directly without using dynamic memory given to us our weapon of choice (calloc, malloc, etc…), this varibale will live on the <strong>stack</strong>.</p>
+<h3 id="main">main()</h3>
+<p>The scope of the variable below is inside the main() function. Since we assigned it a value directly without using dynamic memory given to us by our weapon of choice (calloc, malloc, etc…), this varibale will live on the <strong>stack</strong>.</p>
 
 <div class="language-c highlighter-rouge"><pre class="highlight"><code><span class="kt">int</span> <span class="n">main_x</span> <span class="o">=</span> <span class="mi">8</span><span class="p">;</span>
 </code></pre>
@@ -210,8 +210,9 @@ Reading time ~6 minutes
 
 <p>As the stack shrinks when it grows, you should recognize that the stack variables will be held in the address space between the ESP and the EBP.</p>
 
-<p><br />
-In the case of our “stack” function, we’ll break it down into two parts.</p>
+<p><br /></p>
+<h3 id="stack">stack()</h3>
+<p>In the case of our “stack” function, we’ll break it down into two parts.</p>
 
 <p>Below are the simple allocations, assign a value into the location (memory address) pointed to by local_8h.</p>
 
@@ -253,7 +254,7 @@ Next up is an assignment operation with a little more <strong>beef</strong> to i
 </div>
 
 <p><br /><br /></p>
-<h3 id="heap">Heap</h3>
+<h3 id="heap">heap()</h3>
 <p>Now we’ll take a look at a different style of memory allocation entirely, with the help of our friend the heap.</p>
 
 <p>First is the simple allocation of the starting address to the memory region we were given:</p>
