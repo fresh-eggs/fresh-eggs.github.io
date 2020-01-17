@@ -12,7 +12,7 @@
 <published>2018-02-24T00:00:00-05:00</published>
 <updated>2018-02-24T00:00:00-05:00</updated>
 <id>/2018/02/24/From-C-to-x86-:-part0x01-variables</id>
-<content type="html" xml:base="/2018/02/24/From-C-to-x86-part0x01-variables.html">&lt;p&gt;Welcome back for another action packed installment of x86 assembly for C programmers!&lt;/p&gt;
+<content type="html" xml:base="/2018/02/24/From-C-to-x86-part0x01-variables.html">&lt;p&gt;Welcome  back for another action packed installment of x86 assembly for C programmers!&lt;/p&gt;
 
 &lt;p&gt;We’ll be focusing on all things varibles in this article. We’ll take a look at the two major allocation scenarios consisting of memory on the stack and memory on the heap.&lt;/p&gt;
 
