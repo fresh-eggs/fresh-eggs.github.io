@@ -27,9 +27,11 @@ make a release ready version of the emulator
 
 Long before the advent of the modern internet, online gaming had a fractured but active community. One piece of hardware that made this possible on the Super Nintendo Entertainment System was the XBAND Video Game Modem.
 
-We'll discus how I approached building a debugging environment followed by a deep dive into the XBAND. We'll follow this up with some bug hunting and finish with how I was able to e xecute arbitrary code on my Super Nintendo, through a phone line, in the year 2022.
+As someone very interested in the early internet, I thought it would be fun to dig into the XBAND and learn more about the cartridge. Originally interested in the device from a security perspective, this project quickly led me to adding emulated support for the XBAND on SNES emulators and building out a debugging environment. Below is my attempt to document what I learned along the way in the hopes that it servces as a reference for anyone else interested in getting started with XBAND projects. 
 
-##XBAND (what is it even?)
+We'll be begin with how emulation support was imlemented, dig into how the XBAND works and finish with how I was able to execute arbitrary code on my Super Nintendo, through a phone line, in the year 2022.
+
+## XBAND (what is it even?)
 Xband, designed by Catapult Entertainment, was a video game modem for game consoles of the early 90s. Efforts to revive the XBAND network have sprung up throughout the years by various groups. Most recently, @argirisan from the  Retrocomputing network managed to host a functional XBAND server. Details on this latest revival and the history of expand are available [here](https://xband.retrocomputing.network/) and [here](https://www.youtube.com/watch?v=k_5M-z_RUKA).
 
 I spent time [wrtiting software for the SNES](https://github.com/fresh-eggs/snes-northsec-2021) for the [Northsec CTF](https://nsec.io/competition/) in 2021 and decided to make use of my SNES architecture literacy by spendings time bug hunting on the XBAND for SNES.
