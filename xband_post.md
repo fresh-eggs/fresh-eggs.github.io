@@ -59,12 +59,10 @@ In the emulator source, most of this takes place within the following:
 - `bsnes/snes/chip/xband/xband_cart.cpp`
 
 Below is a graphic demonstrating how memory is laid out within the Super Nintendo. The first byte in the 16bit address denotes the data bank, the next two denote the offset into that bank.
-
-[attach image of the memory mapping you made]
-![credits: https://emudev.de](/home/eggs/security/src/snes/blogpost/xband_memory_map.png  "XBAND Ranges Added to Memory ")
+![SNES Memory Layout With XBAND Ranges](/assets/xband_memory_map.png)
 (credits: https://emudev.de)
 
-The following are relevant memory ranges for the XBAND ROM:
+The following are some of the relevant memory ranges for the XBAND ROM:
 ```
   D00000h-DFFFFFh  1MB ROM
   E00000h-E0FFFFh  64K SRAM 
@@ -73,24 +71,23 @@ The following are relevant memory ranges for the XBAND ROM:
 (credits: https://problemkaputt.de/fullsnes.htm)
 
 Below is an example of the memory range hooks for processing reads to XBAND SRAM and Memory Mapped I/O:
-```c++
+```C
 uint8 XBANDBase::read(unsigned addr) {
-  
-  // process reads for the memory range assigned to SRAM
-  // 0xE00000 - 0xFAFFFF
-  // 0xFB0000 - 0xFBBFFF
-  //(0xFBC000 - 0xFBFE00)
-  // 0xFC0000 - 0xFFFFFF
-  // 0x600000 - 0x7DFFFF
-  if(within<0xe0, 0xfa, 0x0000, 0xffff>(addr)
-  || within<0xfb, 0xfb, 0x0000, 0xbfff>(addr)
-  || within<0xfc, 0xff, 0x0000, 0xffff>(addr)
-  || within<0x60, 0x7d, 0x0000, 0xffff>(addr)) {
-  	addr = (addr & 0xffff);
-	addr = bus.mirror(addr, memory::xbandSram.size());
-    return memory::xbandSram.read(addr);
-  }
-  [...]
+	// process reads for the memory range assigned to SRAM
+	// 0xE00000 - 0xFAFFFF
+	// 0xFB0000 - 0xFBBFFF
+	//(0xFBC000 - 0xFBFE00)
+	// 0xFC0000 - 0xFFFFFF
+	// 0x600000 - 0x7DFFFF
+	if(within<0xe0, 0xfa, 0x0000, 0xffff>(addr)
+	|| within<0xfb, 0xfb, 0x0000, 0xbfff>(addr)
+	|| within<0xfc, 0xff, 0x0000, 0xffff>(addr)
+	|| within<0x60, 0x7d, 0x0000, 0xffff>(addr)) {
+		addr = (addr & 0xffff);
+		addr = bus.mirror(addr, memory::xbandSram.size());
+		return memory::xbandSram.read(addr);
+	}
+	[...]
 }
 ```
 
@@ -132,20 +129,20 @@ uint8 XBANDBase::read(unsigned addr) {
 		[...]
 ```
 For more information on how to interface with the MMIO registers provided by the Rockwell Modem, please consult the following resources:
-- [Table 3.1 in the Rockwell Modem Datasheet](RC2324DPL.pdf)
-- [The Rockwell Modem Designer's Guide](rockwell_modem_designer_guide.pdf)
+- [Table 3.1 in the Rockwell Modem Datasheet](/assets/RC2324DPL.pdf)
+- [The Rockwell Modem Designer's Guide](/assets/rockwell_modem_designer_guide.pdf)
 
 In total this ate up a couple months of free time development with a number of issues along the way. With help from the retrocomputing discord and in particular @argirisan, we were finally able to connect the emulated XBAND SNES ROM to the XBAND network for what we believe to be the first time since ever!
 
-![emulate xband rom receiving bandwidth news](/home/eggs/security/src/snes/blogpost/letsfuckingooooo.png  "emulate xband rom receiving bandwidth news")
+![emulate xband rom receiving bandwidth news](/assets/letsgooo.png)
 
-![iconic](/home/eggs/security/src/snes/xband/iconic.png  "iconic")
+![iconic](/assets/iconic.png)
 
 More information on the genesis emulator and the retrocomputing network available [here](https://xband.retrocomputing.network/).
 
 ## How does XBAND Work
 
-![XBAND PCB](/home/eggs/security/src/snes/blogpost/xband_PCB.jpg  "XBAND PCB")
+![XBAND PCB](/assets/xband_PCB.jpg)
 
 Armed with a functional debugging environment thanks to emulation, I started digging into XBAND Source code that has found it's way onto the internet in order to understand exactly how it works.
 
@@ -156,13 +153,13 @@ The protocol of choice for the XBAND was the Apple Data Streaming Protocol or AD
 
 Packets are framed with a pre-pended null byte and a trailing `\x10\x03`. The data is pre-pended with the ADSP header detailed below.
 
-![ADSP Header](/home/eggs/security/src/snes/blogpost/adsp_header_docs.png  "ADSP Header")
+![ADSP Header](/assets/adsp_header_docs.png)
 
 The XBAND would consume these with the help of the Rockwell modem, de-frame and push the packet onto an appropriate OS-managed FIFO for consumption.
 
 
 Below is a screenshot from my debug build of BSNES-PLUS which dumps each ADSP packet and parses them for printing.
-![ADSP ServerTalk Packet ](/home/eggs/security/src/snes/blogpost/adsp_degbug.png  "ADSP ServerTalk Packet ")
+![ADSP ServerTalk Packet ](/assets/adsp_degbug.png)
 
 If you're interested in learning more, PDF copies of the developer manuals for ADSP are still _very_ available online.
 
@@ -172,7 +169,7 @@ https://github.com/fresh-eggs/bsnes-plus/tree/xband_pkt_injection
 ###ServerTalk / GameTalk
 Networked communication on the XBAND ROM generally fits into two categories. ServerTalk and GameTalk.
 
-![ServerTalk and GameTalk](/home/eggs/security/src/snes/blogpost/servertalk_and_gametalk.png  "ServerTalk and GameTalk")
+![ServerTalk and GameTalk](/assets/servertalk_and_gametalk.png)
 
 ServerTalk is the list of routines for managing Server to Client commands while the GameTalk layer denotes client to client transfers of data during gameplay.
 
@@ -406,23 +403,22 @@ To do this, I put together a one off tool written in PHP based off the work in R
 ?>
 ```
 
-The `$payload` variable contains the ADSP packet header, the ServerTalk opcode for `msExecuteCode` followed by our intructions:
-[picture highlighting the sections]
+The `$payload` variable contains the ADSP packet header, the ServerTalk opcode for `msExecuteCode` followed by our intructions.
 
 The tool will calculate the CRC in addition to frameing the packet appropriately.
 
-At this point, we should be able to set a breakpoint at the ServerTalk `kDispatcherVector` and see if injecting this packet resolves to the handling routine for   `msExecuteCode` messages.
+At this point, we should be able to set a breakpoint at the ServerTalk `kDispatcherVector` and see if injecting this packet resolves to the handling routine for  `msExecuteCode` messages.
 
 Below is out packet:
 
-[adsp_packet_for_do_execute_code_demo.png]
+![Packet Showing do execute code with payload](/assets/adsp_packet_for_do_execute_code_demo.png)
 
 In order to see if this packet resolves to a handler that looks like `MessErr DoExecuteCodeMessageOpCode( void )` in the source, I set a breakpoint at in `_ReceiveServerMessageDispatch` to see where the `kDispatcherVector` resolves.
 
 Sure enough, we end up resolving to a routing that looks excatly like `MessErr DoExecuteCodeMessageOpCode( void )`. I validated this by matching the structure of the XBAND OS function calls by OS Function ID. 
 
 The following is the emulator hitting a breakpoint for the address of the routine that appears to match `MessErr DoExecuteCodeMessageOpCode( void )`:
-[xband__hit_execute_do_code_method.gif]
+![break on the address of DoExecuteCodeMessageOpCode](/assets/xband__hit_execute_do_code_method.gif)
 
 We can see that it has a similar logical structure to the source code:
 ```C
@@ -445,7 +441,7 @@ messageCodeProcPtr	myCodeProc;
 	[...]
 ```
 
-[do_execute_code_asm.png]
+![assembly snippet from debugger showing DoExecuteCodeMessageOpCode](/assets/do_execute_code_asm.png)
 
 We can validate this by using our OS Function lookup table to check the calls being made to `kDispatcherVector`. For instance:
 ```
@@ -457,9 +453,9 @@ JSL   $e00040  (kDispatcherVector)
 These translate to `GetDataSync()` and `GetDataError()` respectively. Going through the rest of the assembly, you'll find the other calls match and the structure of the operations matches what the source intends.
 
 It follows that we should jump to the function pointer containing our code to be executed at some point and indeed we do:
-[xband__hit_do_execute_code_payload.gif]
+![this is the program counter moving to what looks like our provided instructions](xband__hit_do_execute_code_payload.gif)
 
-![debugger_breakpoint_execute_code](/home/eggs/security/src/snes/blogpost/bytes.png  "debugger_breakpoint_execute_code")
+![debugger_breakpoint_execute_code](/assets/bytes.png)
  
 ### Writing a Payload
 
