@@ -418,7 +418,7 @@ In order to see if this packet resolves to a handler that looks like `MessErr Do
 Sure enough, we end up resolving to a routing that looks excatly like `MessErr DoExecuteCodeMessageOpCode( void )`. I validated this by matching the structure of the XBAND OS function calls by OS Function ID. 
 
 The following is the emulator hitting a breakpoint for the address of the routine that appears to match `MessErr DoExecuteCodeMessageOpCode( void )`:
-![break on the address of DoExecuteCodeMessageOpCode](/assets/xband__hit_execute_do_code_method.gif)
+![break on the address of DoExecuteCodeMessageOpCode](/assets/xband__hit_do_execute_code_method.gif)
 
 We can see that it has a similar logical structure to the source code:
 ```C
