@@ -60,7 +60,6 @@ In the emulator source, most of this takes place within the following:
 
 Below is a graphic demonstrating how memory is laid out within the Super Nintendo. The first byte in the 16bit address denotes the data bank, the next two denote the offset into that bank.
 ![SNES Memory Layout With XBAND Ranges](/assets/xband_memory_map.png)
-<img src="/assets/xband_memory_map.png" >
 (credits: https://emudev.de)
 
 The following are some of the relevant memory ranges for the XBAND ROM:
