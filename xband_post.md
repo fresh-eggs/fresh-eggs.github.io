@@ -27,23 +27,25 @@ make a release ready version of the emulator
 
 Long before the advent of the modern internet, online gaming had a fractured but active community. One piece of hardware that made this possible on the Super Nintendo Entertainment System was the XBAND Video Game Modem.
 
-As someone very interested in the early internet, I thought it would be fun to dig into the XBAND and learn more about the cartridge. Originally interested in the device from a security perspective, this project quickly led me to adding emulated support for the XBAND on SNES emulators and building out a debugging environment. Below is my attempt to document what I learned along the way in the hopes that it servces as a reference for anyone else interested in getting started with XBAND projects. 
+As someone very interested in the early internet, I thought it would be fun to dig into the XBAND and learn more about the cartridge. Originally interested in the device from a security perspective, this project quickly led to developing emulation support for the XBAND on SNES in addtion to figuring out a debugging environment.
+
+I've attempted to document what I learned along the way in the hopes that it serves as a reference for anyone interested in getting started with similar projects. 
 
 We'll be begin with how emulation support was imlemented, dig into how the XBAND works and finish with how I was able to execute arbitrary code on my Super Nintendo, through a phone line, in the year 2022.
 
 ## XBAND (what is it even?)
-Xband, designed by Catapult Entertainment, was a video game modem for game consoles of the early 90s. Efforts to revive the XBAND network have sprung up throughout the years by various groups. Most recently, @argirisan from the  Retrocomputing network managed to host a functional XBAND server. Details on this latest revival and the history of expand are available [here](https://xband.retrocomputing.network/) and [here](https://www.youtube.com/watch?v=k_5M-z_RUKA).
+Xband, designed by Catapult Entertainment, was a video game modem for consoles of the early 90s. Efforts to revive the XBAND network have sprung up throughout the years by various groups. Most recently, @argirisan from the  Retrocomputing network managed to develop and host a functional XBAND server. Details on this latest revival are available [here](https://xband.retrocomputing.network/) and a highly recommended documentary by Wrestles with Gaming on the history of XBAND is availble [here](https://www.youtube.com/watch?v=k_5M-z_RUKA).
 
-I spent time [wrtiting software for the SNES](https://github.com/fresh-eggs/snes-northsec-2021) for the [Northsec CTF](https://nsec.io/competition/) in 2021 and decided to make use of my SNES architecture literacy by spendings time bug hunting on the XBAND for SNES.
+Having spent time [writing software for the SNES](https://github.com/fresh-eggs/snes-northsec-2021) for the [Northsec CTF](https://nsec.io/competition/) in 2021, I decided to make use of my SNES architecture literacy by spendings time bug hunting on the XBAND for SNES.
 
-## Designing Test Infrastructure
-In order to have a functional debug environment, I opted for a software based approach given the limited options available for hardware debugging on the SNES.
+## Designing a Debugging Environment
+In order to begin understanding how the XBAND works, I wanted to have a functional debug environment. I opted for a software based approach given the limited options available for hardware debugging on the SNES.
 
-Searching around for emulation support for XBAND on the SNES yielded limited results. The only attempt I could find was in the [BS-X Project](https://project.satellaview.org). Forked from [BSNES](https://github.com/bsnes-emu/bsnes), the BSNES-SX2-v009 source code seemed to begin implementing support for the XBAND ROM but stopped short of actually being able to connect to an XBAND server.
+Searching around for emulation support for XBAND on the SNES yielded few results. The only attempt I could find was in the [BS-X Project](https://project.satellaview.org). Forked from [BSNES](https://github.com/bsnes-emu/bsnes), the BSNES-SX2-v009 source code seemed to begin implementing support for the XBAND ROM but stopped short of fully emulating the hardware modem.
 
-With that in mind, I began looking for emulators with robust debugging. I eventually found the debug oriented fork of BSNES named [BSNES-PLUS](https://github.com/devinacker/bsnes-plus).
+With that in mind, I began looking for similar emulators with robust debugging. I eventually found the debug oriented fork of BSNES named [BSNES-PLUS](https://github.com/devinacker/bsnes-plus).
 
-I decided it would be worthwhile investing time both porting and finishing the work in BSNES-SX2 over to BSNES-PLUS. Getting the XBAND ROM booting in a debug oriented emulator and connecting to the retrocomputing XBAND server was worth doing for my project and for games preservation in general. The only thing standing in my way was that I had no experience writting software for emulators but this was about to change!
+I decided it would be worthwhile investing time both porting and finishing the work in BSNES-SX2 over to BSNES-PLUS. Getting the XBAND ROM booting in a debug oriented emulator and connecting to the retrocomputing XBAND server was worth doing for my project and for games preservation in general. The only thing standing in my way was that I had zero experience writting emulators.
 
 
 ## Building emulation Support
@@ -58,7 +60,7 @@ In the emulator source, most of this takes place within the following:
 - `bsnes/snes/chip/xband/xband_base.cpp`
 - `bsnes/snes/chip/xband/xband_cart.cpp`
 
-Below is a graphic demonstrating how memory is laid out within the Super Nintendo. The first byte in the 16bit address denotes the data bank, the next two denote the offset into that bank.
+Below is a graphic demonstrating how memory is laid out within the Super Nintendo. The first byte in the address denotes the data bank, the next two denote the offset into that bank.
 ![SNES Memory Layout With XBAND Ranges](/assets/xband_memory_map.png)
 (credits: https://emudev.de)
 
@@ -70,7 +72,7 @@ The following are some of the relevant memory ranges for the XBAND ROM:
 ```
 (credits: https://problemkaputt.de/fullsnes.htm)
 
-Below is an example of the memory range hooks for processing reads to XBAND SRAM and Memory Mapped I/O:
+Below is an example of the memory range hooks for processing reads to XBAND SRAM:
 ```C
 uint8 XBANDBase::read(unsigned addr) {
 	// process reads for the memory range assigned to SRAM
@@ -91,31 +93,24 @@ uint8 XBANDBase::read(unsigned addr) {
 }
 ```
 
-### Porting the Retrocomputing Network Genesis Implementation
-In addition to hosting a functional server, @argirisan built support for the Genesis XBAND ROM into the BLASTEM emulator.
+### Memory Mapped I/O for the Rockwell Modem
+The XBAND made use of a Rockwell Model RC2324DP. It interfaced with the modem via Memory Mapped I/O (MMIO). The emulators needed to correctly support reads and writes to memory locations marked for modem MMIO.
 
-This work served invaluable in my attempt to add support to BSNES-PLUS to connect the XBAND ROM to the retrocomputing servers. While there were a number of differences between the two consoles, having this as a reference made all the difference and I doubt the project would be in this state without it.
-
-In short, getting the ROMs connected to the new servers required emulating the Memory Mapped I/O (MMIO) interactions between the XBAND ROM and the Rockwell Modem included on the cartridge.
-
-To do this, we simply capture reads to the MMIO memory ranges, calculate the correct offset for those ranges to deduce the intended rockwell register and process the read or write operation accordingly.
+To do this, we start by capturing reads and writes to the MMIO memory range. For each operation, we calculate an offset that gives us the relative Rockwell modem register the operation is intended for and update the emulator state accordingly. 
 
 Below is an example snippet of the read hooks for the Rockwell MMIO ranges:
 
 ```C
 uint8 XBANDBase::read(unsigned addr) {
 
-  //0xFBC000 -- 0xFBFE00
-  if(within<0xfb, 0xfb, 0xc000, 0xfdff>(addr)) {
-	  uint8 reg = (addr-0xFBC000)/2;
+	//0xFBC000 -- 0xFBFE00
+	if(within<0xfb, 0xfb, 0xc000, 0xfdff>(addr)) {
+		uint8 reg = (addr-0xFBC000)/2;
 		
-    if (reg == 0x7d)
+		if (reg == 0x7d)
 			return 0x80;
-		//if (reg == 0x7c) //kAddrStatus
-		//	return 0;
 		if (reg == 0xb4) //kLEDData
 			return 0x7f;
-
 		if (reg == 0x94) { //krxbuff
 			if (x->rxbufused >= x->rxbufpos) return 0;
 			uint8_t r = x->rxbuf[x->rxbufused];
@@ -131,35 +126,37 @@ uint8 XBANDBase::read(unsigned addr) {
 For more information on how to interface with the MMIO registers provided by the Rockwell Modem, please consult the following resources:
 - [Table 3.1 in the Rockwell Modem Datasheet](/assets/RC2324DPL.pdf)
 - [The Rockwell Modem Designer's Guide](/assets/rockwell_modem_designer_guide.pdf)
+- [nocash SNES hardware specifications](http://problemkaputt.de/fullsnes.htm#snescartxbandiorockwellmodemports)
 
-In total this ate up a couple months of free time development with a number of issues along the way. With help from the retrocomputing discord and in particular @argirisan, we were finally able to connect the emulated XBAND SNES ROM to the XBAND network for what we believe to be the first time since ever!
+In total this took a couple months of free time development with a number of interesting issues along the way. With help from the retrocomputing discord and in particular @argirisan, we finally connected the emulated XBAND SNES ROM to the XBAND network for what we believe to be the first time since ever!
+
+Having the original implementation on Genesis emulators done by @argirisan as a reference made all the difference and I doubt the project would be in this state without it.
 
 ![emulate xband rom receiving bandwidth news](/assets/letsgooo.png)
 
 ![iconic](/assets/iconic.png)
 
-More information on the genesis emulator and the retrocomputing network available [here](https://xband.retrocomputing.network/).
 
 ## How does XBAND Work
 
 ![XBAND PCB](/assets/xband_PCB.jpg)
 
-Armed with a functional debugging environment thanks to emulation, I started digging into XBAND Source code that has found it's way onto the internet in order to understand exactly how it works.
+Now equipped with a functional debugging environment, I started digging into the XBAND source code that has found it's way onto the internet in order to understand exactly how it works.
 
-The Xband was designed to send controller inputs between connected clients through the XBAND network with the help of the Rockwell Modem Model RC2324DP. By acting similar to a GameGenie, the XBAND OS would patch the ROM provided by the game cartridge inserted into it's slot with it's own instructions to capture and inject controller input. Truly wild stuff.
+The Xband was designed to send controller inputs between connected clients through the XBAND network with the help of the Rockwell Modem. By acting similar to a GameGenie, the XBAND OS would patch the ROM provided by the game cartridge inserted into it's slot with it's own instructions to capture and inject controller input. Truly wild stuff.
 
 ###ADSP
 The protocol of choice for the XBAND was the Apple Data Streaming Protocol or ADSP. ADSP was able to provide a basic session layer between two hosts.
 
-Packets are framed with a pre-pended null byte and a trailing `\x10\x03`. The data is pre-pended with the ADSP header detailed below.
+Packets are framed with a pre-pended null byte and a trailing `\x10\x03`. Packets also contain a CRC added prior to the trailing `\x10\x03`. The data is pre-pended with the ADSP header detailed below.
 
 ![ADSP Header](/assets/adsp_header_docs.png)
 
 The XBAND would consume these with the help of the Rockwell modem, de-frame and push the packet onto an appropriate OS-managed FIFO for consumption.
 
 
-Below is a screenshot from my debug build of BSNES-PLUS which dumps each ADSP packet and parses them for printing.
-![ADSP ServerTalk Packet ](/assets/adsp_degbug.png)
+Below is a screenshot with some packet details from my debug build of BSNES-PLUS which dumps each ADSP packet and parses them for printing.
+![ADSP ServerTalk Packet](/assets/adsp_degbug.png)
 
 If you're interested in learning more, PDF copies of the developer manuals for ADSP are still _very_ available online.
 
@@ -179,15 +176,11 @@ If you're interested in helping with that effort, please don't hesitate to get i
 
 ### Message Dispatch
 
-The XBAND OS made heavy use of message dispatch in order to both service OS Function calls in addition to routing ServerTalk packets to their appropriate decoding routine. 
+The XBAND OS made heavy use of message dispatch in order to execute OS Function calls in addition to routing ServerTalk packets to their appropriate decoding routine.
 
-For those less familiar with message dispatching, think of it as an array of function pointers. In order for ServerTalk to function, the XBAND OS maintains a list of MessageIDs. Each MessageID corresponds to a parsing routine available in the ROM. The `_ReceiveServerMessageDispatch` function sets up a call to the `kDispatcherVector` which appears to calculate the relaitve address of corresponding handler given a set of params.
+For those less familiar with message dispatching, think of it as an array of function pointers. In order for ServerTalk to function, the XBAND OS maintains a list of MessageIDs. Each MessageID corresponds to a parsing routine available in the ROM. The `_ReceiveServerMessageDispatch` function sets up a call to the `kDispatcherVector` which appears to calculate the relaitve address of the corresponding handler given a set of params.
 
 Below is a snippet of the C function with inline assembly that handles this for ServerTalk messages. It first loads the opCode(MessageID) into the `A` register followed by  jumping to the address of the MessageDispatcher.
-
-
-
-
 
 ```C
 MessErr _ReceiveServerMessageDispatch( short opCode )
@@ -227,31 +220,31 @@ Below is a snippet of each of the documented ServerTalk message IDs expceted to 
 #define msEndOfStream					2
 #define	msGamePatch 					3
 #define	msSetDateAndTime 				4
-#define	msServerMiscControl 			5
+#define	msServerMiscControl 				5
 #define msExecuteCode					9
 #define msPatchOSCode					10
-#define msRemoveDBTypeOpCode			12
-#define	msRemoveMessageHandler			13
+#define msRemoveDBTypeOpCode				12
+#define	msRemoveMessageHandler				13
 #define msRegisterPlayer				14
 #define	msNewNGPList					15
-#define	msSetBoxSerialNumber			16
+#define	msSetBoxSerialNumber				16
 #define	msGetTypeIDsFromDB				17
 #define	msAddItemToDB					18
 #define	msDeleteItemFromDB				19
 #define	msGetItemFromDB					20 
-#define	msGetFirstItemIDFromDB			21
-#define	msGetNextItemIDFromDB			22
+#define	msGetFirstItemIDFromDB				21
+#define	msGetNextItemIDFromDB				22
 #define	msClearSendQ					23
-#define msLoopBack						27		
+#define msLoopBack					27		
 #define msWaitForOpponent				28
-#define msOpponentPhoneNumber			29
+#define msOpponentPhoneNumber				29
 #define msReceiveMail					30
 #define msNewsHeader					31
-#define msNewsPage						32
-#define msUNUSED1						33		
+#define msNewsPage					32
+#define msUNUSED1					33		
 #define msQDefDialog					34
-#define msAddAddressBookEntry			35
-#define msDeleteAddressBookEntry		36
+#define msAddAddressBookEntry				35
+#define msDeleteAddressBookEntry			36
 #define msReceiveRanking				37
 #define	msDeleteRanking					38
 #define	msGetNumRankings				39
@@ -259,31 +252,31 @@ Below is a snippet of each of the documented ServerTalk message IDs expceted to 
 #define	msGetNextRankingID				41
 #define	msGetRankingData				42
 #define	msSetBoxPhoneNumber				43
-#define	msSetLocalAccessPhoneNumber		44
+#define	msSetLocalAccessPhoneNumber			44
 #define msSetConstants					45
 #define	msReceiveValidPers				46
 #define	msGetInvalidPers				47
-#define msCorrelateAddressBookEntry		49
-#define	msReceiveWriteableString		50
+#define msCorrelateAddressBookEntry			49
+#define	msReceiveWriteableString			50
 #define	msReceiveCredit					51
-#define	msReceiveRestrictions			52
-#define msReceiveCreditToken			53
-#define msSetCurrentUserName			54
+#define	msReceiveRestrictions				52
+#define msReceiveCreditToken				53
+#define msSetCurrentUserName				54
 #define msSetBoxHometown				56
 #define	msGetConstant					57
-#define	msReceiveProblemToken			58
-#define	msReceiveValidationToken		59
-#define	msLiveDebitSmartCard			60
+#define	msReceiveProblemToken				58
+#define	msReceiveValidationToken			59
+#define	msLiveDebitSmartCard				60
 #define msSendDialScript				61
-#define msSetCurrentUserNumber			62
+#define msSetCurrentUserNumber				62
 #define msBoxWipeMind					63
 #define msGetHiddenSerials				64
 #define	msGetLoadedGameInfo				66
 #define msClearNetOpponent				67
 #define msGetBoxMemStats				68
-#define msReceiveRentalSerialNumber		69
+#define msReceiveRentalSerialNumber			69
 #define msReceiveNewsIndex				70
-#define msReceiveBoxNastyLong			71
+#define msReceiveBoxNastyLong				71
 ```
 
 Below is a list I made of the SNES OS Function IDs that can be passed to the `kDispatcherVector` via the `X` register.
@@ -297,41 +290,41 @@ During the course of this work, I collected a number of symbols from the Retail 
 These will likely be useful for anyone working in this space. We could explore getting all of them programatically.
 
 ```
-DoExecuteCode					(0xd57c8b)
-TReadBytesReady					(0xd4ba0b)
-TDataReady						(0xd4c579)
-TDataReadySess					(0xd4c496)
-TNetIdle						(0xd4d3f2)
-PNetIdle						(0xd51220)
-PUProcessIdle					(0xd518d8)
-FifoRead						(0xd56177)
-_PUProcessSTIdle				(0xd51988)
-TIndication						(0xd4cc5f)
-DoSendSendQElementsOpCode		(0xd5a976)
-ProcessServerData				(0xd5cc99)
-ReceiveServerMessageDispatch	(0xd5cbda)
-GetSerialOpCode 				(0xd5cd91)
-GetDataBytesReady				(0xd4fafd)
-_SendMessage					(0xD5CBA6) 
-GetDataError					(0xd4fb25)
-TNetError						(0xd4ec8b)
-TUGetError						(0xd4ed4f)
-DecompressDataToBuffer			(0xd7ab0f)
-kInitSoundMgr/_InitSoundMgr 	(0xd2be0c)
-DBGetItem						(0xd07145)
+DoExecuteCode					0xd57c8b
+TReadBytesReady					0xd4ba0b
+TDataReady					0xd4c579
+TDataReadySess					0xd4c496
+TNetIdle					0xd4d3f2
+PNetIdle					0xd51220
+PUProcessIdle					0xd518d8
+FifoRead					0xd56177
+_PUProcessSTIdle				0xd51988
+TIndication					0xd4cc5f
+DoSendSendQElementsOpCode			0xd5a976
+ProcessServerData				0xd5cc99
+ReceiveServerMessageDispatch			0xd5cbda
+GetSerialOpCode 				0xd5cd91
+GetDataBytesReady				0xd4fafd
+_SendMessage					0xd5cba6 
+GetDataError					0xd4fb25
+TNetError					0xd4ec8b
+TUGetError					0xd4ed4f
+DecompressDataToBuffer				0xd7ab0f
+kInitSoundMgr/_InitSoundMgr 			0xd2be0c
+DBGetItem					0xd07145
 ```
 
 
 ## Remote Code Exectuion over the phone lines in 2022
 
 ### msExecuteCode
-After spending a month hunting for bugs, I found one heap based overflow that did not appear expoitable. At this point, I decided it was time to revisit msExecuteCode.
+After spending a month hunting for bugs, I found a few but unfortunately nothing practically exploitable. (more on that later). At this point, I decided it was time to revisit an _interesting_ ServerTalk message ID I found in the source code. The message ID in question was `msExecuteCode`.
 
-Initially I thought this couldn't possibly be in the retail release right ? Let's find out!
+Initially I thought this couldn't possibly be in the retail release right? Let's find out!
 
 Leveraging the packet injection function I added to the emulator, I built a ServerTalk packet intended to trigger an `msExecuteCode`.
 
-To do this, I put together a one off tool written in PHP based off the work in Roofgarden to quickly frame a valid ADSP packet given ADSP data:
+To do this, I put together a one off tool written in PHP based off the work in Roofgarden done by @argirisan to quickly frame a valid ADSP packet given ADSP data:
 
 ```php
 <?php
@@ -403,24 +396,33 @@ To do this, I put together a one off tool written in PHP based off the work in R
 ?>
 ```
 
-The `$payload` variable contains the ADSP packet header, the ServerTalk opcode for `msExecuteCode` followed by our intructions.
+The `$payload` variable contains the ADSP packet header, the ServerTalk opcode for `msExecuteCode` followed by our intructions. The tool will calculate the CRC in addition to frameing the packet appropriately.
 
-The tool will calculate the CRC in addition to frameing the packet appropriately.
-
-At this point, we should be able to set a breakpoint at the ServerTalk `kDispatcherVector` and see if injecting this packet resolves to the handling routine for  `msExecuteCode` messages.
+`msExecuteCode` is listed as message ID `0x09` in the list I provided earlier and the source code expects to read a `long` value for the code size followed by the code itself.
 
 Below is out packet:
-
 ![Packet Showing do execute code with payload](/assets/adsp_packet_for_do_execute_code_demo.png)
 
-In order to see if this packet resolves to a handler that looks like `MessErr DoExecuteCodeMessageOpCode( void )` in the source, I set a breakpoint at in `_ReceiveServerMessageDispatch` to see where the `kDispatcherVector` resolves.
+At this point, we should be able to set a breakpoint within `_ReceiveServerMessageDispatch` (`0xd5cbda`) and see if injecting this packet triggers the `kDispatcherVector` to resolve a processing routine for `msExecuteCode` messages.
 
-Sure enough, we end up resolving to a routing that looks excatly like `MessErr DoExecuteCodeMessageOpCode( void )`. I validated this by matching the structure of the XBAND OS function calls by OS Function ID. 
-
-The following is the emulator hitting a breakpoint for the address of the routine that appears to match `MessErr DoExecuteCodeMessageOpCode( void )`:
+Sure enough, we end up resolving to a routine that looks like `MessErr DoExecuteCodeMessageOpCode( void )`:
 ![break on the address of DoExecuteCodeMessageOpCode](/assets/xband__hit_do_execute_code_method.gif)
 
-We can see that it has a similar logical structure to the source code:
+I validated this by matching the structure of the XBAND OS function calls by OS Function ID between the source and the assmebly. We can see here a snippet from the assmebly:
+
+![assembly snippet from debugger showing DoExecuteCodeMessageOpCode](/assets/do_execute_code_asm.png)
+
+We can validate that the OS function calls provided to the `kDispatcherVector` match between the source code and the assembly. (using the OS Function lookup table I provided earlier.)
+
+For example:
+```
+LDX  #$0209
+JSL  $e00040  (kDispatcherVector)
+LDX  #$020b
+JSL  $e00040  (kDispatcherVector)
+```
+
+These translate to `GetDataSync()` (`0x209`) and `GetDataError()` (`0x20b`) respectively. Going through the rest of the assembly, you'll find the other calls match and the overal structure of the other operations match what the source intends.
 ```C
 MessErr DoExecuteCodeMessageOpCode( void )
 {
@@ -438,25 +440,31 @@ messageCodeProcPtr	myCodeProc;
 	SWAP4(length);
 	myCodeProc = (messageCodeProcPtr)NewMemory( kTemp,  length );
 	GetDataSync( length, (Ptr)myCodeProc );
-	[...]
+
+	result = 0;
+	if( GetDataError() )
+	{
+		result = kFatalStreamError;
+	}
+	else
+	{
+		UnCacheLoadedCode(myCodeProc, length);
+		(*myCodeProc)();
+		VDPIdle();
+	}
+	DisposeMemory( myCodeProc );
+	return result;
+}
 ```
 
-![assembly snippet from debugger showing DoExecuteCodeMessageOpCode](/assets/do_execute_code_asm.png)
 
-We can validate this by using our OS Function lookup table to check the calls being made to `kDispatcherVector`. For instance:
-```
-LDX  #$0209
-JSL   $e00040  (kDispatcherVector)
-LDX  #$020b
-JSL   $e00040  (kDispatcherVector)
-```
-These translate to `GetDataSync()` and `GetDataError()` respectively. Going through the rest of the assembly, you'll find the other calls match and the structure of the operations matches what the source intends.
-
-It follows that we should jump to the function pointer containing our code to be executed at some point and indeed we do:
+If we're are correct, it follows that we should jump to the function pointer containing our code to be executed at some point and indeed we do:
 ![this is the program counter moving to what looks like our provided instructions](xband__hit_do_execute_code_payload.gif)
 
 ![debugger_breakpoint_execute_code](/assets/bytes.png)
- 
+
+Very cool!
+
 ### Writing a Payload
 
 This small program will reset the state of important control registers like the Direct Page register and the Data Bank register followed by calling our routine at `MAIN`.
@@ -507,7 +515,7 @@ In order to deliver this packet to real hardware, I decided to get a copy of the
 
 To do this, I needed to setup my first Software PBX! For this I used `asterisk`. With the help of @argirisan I setup a simple profile to answer calls from the XBAND modem when it dials `1-800-207-1194` and routed them to my local copy of Roofgarden running on my laptop with the help of a [softmodem extension](https://github.com/proquar/asterisk-Softmodem).
 
-Here is the `asterisk` profile:
+Here are the `asterisk` `.conf` files:
 ```
 9:58:50 › cat /etc/asterisk/sip.conf 
 [upaihddfqysqzigy]
@@ -543,58 +551,48 @@ exten => 18002071194,1,Answer()
 autoload = yes
 ```
 
+Once everything was setup all we had to do was dial the XBAND Network and our `msExecuteCode` packet should be injected. If this feature really does exist on retail cartridges, the payload should execute.
+
+[video of the POC]
+
 I've never been so excited for a shade of green in my life.
 
-## Bug Hunting and Failed Exploitation Attempts
+## Bug Hunting
+As mentioned earlier, I had found a few issues but nothing exploitable. I wanted to document the areas I explored for anyone looking for a good place to start.
 
-### Server Talk bugs
+### Overwritting Function Pointers in the DB
+The XBAND Modem builds a database of stored config information within SRAM. Some entries in this DB contain function pointers or contain the address of a routine. 
 
-The XBAND Modem builds a database of stored setup information within SRAM.
-
-Entries in this DB often contain routines that have function pointers pointing to them.
-
-
-Really any function pointer in general could be vulnerable to takeover if you have control over DB items it relies on to caluclate the address.
-
-I used this regex to find instances of function pointers:
-\s\(\*.*\)\(
-
-
-  Exploiting kSNESAudioDriverType
-  - DoGetFirstItemIDFromDB(kSNESAudioDriverType)
-  - DoDeleteItemFromDB(kSNESAudioDriverType, theID)
-  - DoAddItemToDB(kSNESAudioDriverType, some_id)
-    - theData is your payload 
-  - at this point, the box DB should be poisoned with our payload as the SNES audio driver.
-  - according to a comment in DBTypes.h, this value
-  is not purged and should persist on a restart.
-  - next time you restart your box, the driver should run and BAM
-
-
-- seems you can overwrite any DB entry given you have the ID of the corresponding entry and your payload fits a certain size constraint.
-
-- The remote message handler offers the follow DB related messages:
+There are a handful of ServerTalk messages that allow for you to modify DB entries:
+```
   msGetTypeIDsFromDB
   msAddItemToDB
   msDeleteItemFromDB
   msGetItemFromDB
   msGetFirstItemIDFromDB
   msGetNextItemIDFromDB
+```
 
-By leveraging those, you sould be able to resolve the ID for any item in the target DB.
-
-- given that you potentially have total control over DB contents, are there any DB types that point to executbale code?
-
+There are most likely some entries that you can overwrite wich persist a restart. You can like store payloads within X-Mail messages. I explored this with the `kSNESAudioDriverType` entry.
 
 
-**bug in short _PutByte(register ByteContext *bytxt, register const unsigned char byte):
 
-  // This logic allows for a single char to be written up to 244 times 
-  // Given the following params, you set the rleChar, followed by writting it
-  // 244 times on the second call to PutByte
-  // bufsize = 4, bytxt->rleFlag = 1, [kRLEescape, some_rle_char, 255], bytxt->rleState = 2, 
+### _PutByte
 
-After ripping through these, I started digging through the list of MessageIDs for anything with potentially dangerouns functionality:
+`short _PutByte(register ByteContext *bytxt, register const unsigned char byte)` has an issue where crafted input can result in a re-write of a single char 244 times. The impacted buffer is based on the X. I didn't dig too much into this but it didn't seem that useful.
+
+Given the following params, it looks like you set the `rleChar`, followed by writting it 244 times on the second call to `_PutByte`
+
+```
+bufsize = 4
+bytxt->rleFlag = 1,
+[kRLEescape, some_rle_char, 255]
+bytxt->rleState = 2,
+```
+
+### ServerTalk Messages and Related Parsing Routines
+Originally I started with learning about all of the parsing routines involved in handling any of the following ServerTalk messages:
+```
 	msRegisterPlayer
 	msExecuteCode
 	msNewsPage
@@ -605,33 +603,16 @@ After ripping through these, I started digging through the list of MessageIDs fo
 	msSetBoxHometown
 	msSendDialScript
 	msReceiveBoxNastyLong
+```
 
+I focused on ServerTalk messages that accepted and parsed user supplied data. In these I found one unbounded write to SRAM from the body of X-Mail messages. It was not very useful given the size constraints required to trigger the unbounded write.
 
-	Mail bug
-	
-	News Compression algos
-
-	???
-
-	Message bugs (found but unexploitable)
-
-	List of Interesting MessageIDs:
- 		msRegisterPlayer      (not inspected)
- 		msExecuteCode         (exploitable)
- 		msNewsPage            (rendering bugs)
- 		msNewsHeader          (rendering bugs)
- 		msReceiveMail         (rendering bugs)
- 		msAddAddressBookEntry 
- 		msSetCurrentUserName
- 		msSetBoxHometown
- 		msSendDialScript
- 		msReceiveBoxNastyLong
+There is quite a bit of attack surface involved in all the parsing routines for these messages. I'm sure I missed some things.
 
 ## What is next
 
-Emulate gameplay to mess with Client Talk bugs
+Next up for this project would be to finish emulating gameplay. This would open up our ability to get a debugger attached to the ClientTalk portion of XBAND which likely has interesting attack surface given that it is client to client.
 
-Hunt for more exploitable Server Talk Bugs
+As mentioned, if you're interested in helping out with this effort please don't hesitate to get in touch with me (fresh-eggs) on the [retrocomputing discord](https://xband.retrocomputing.network/).
 
-
-## Attach release of emulator and the branch with packet injection .
+On the github repository you'll find the packet injection oriented branch, the branch that began implementing gameplay support and the latest releases that provide fully emulated ServerTalk features and the ability to connect to the retrocomputingnetwork servers.
