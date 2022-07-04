@@ -118,7 +118,7 @@ Now equipped with a functional debugging environment, I started digging into the
 
 The Xband was designed to send controller inputs between connected clients through the XBAND network with the help of the Rockwell Modem. By acting similar to a GameGenie, the XBAND OS would patch the ROM provided by the game cartridge inserted into it's slot with it's own instructions to capture and inject controller input. Truly wild stuff.
 
-###ADSP
+### ADSP
 The protocol of choice for the XBAND was the Apple Data Streaming Protocol or ADSP. ADSP was able to provide a basic session layer between two hosts.
 
 Packets are framed with a pre-pended null byte and a trailing `\x10\x03`. Packets also contain a CRC added prior to the trailing `\x10\x03`. The data is pre-pended with the ADSP header detailed below.
@@ -136,7 +136,7 @@ If you're interested in learning more, PDF copies of the developer manuals for A
 I also have a debug oriented branch of the emulator available that allows for the injection of ADSP packets into the ROM (some assembly required):
 https://github.com/fresh-eggs/bsnes-plus/tree/xband_pkt_injection
 
-###ServerTalk / GameTalk
+### ServerTalk / GameTalk
 Networked communication on the XBAND ROM generally fits into two categories. ServerTalk and GameTalk.
 
 ![ServerTalk and GameTalk](/assets/servertalk_and_gametalk.png)
@@ -251,6 +251,8 @@ Below is a snippet of each of the documented ServerTalk message IDs expceted to 
 #define msReceiveNewsIndex				70
 #define msReceiveBoxNastyLong				71
 ```
+
+The XBAND also used message dispatching for XBAND OS function calls.
 
 Below is a list I made of the SNES OS Function IDs that can be passed to the `kDispatcherVector` via the `X` register.
 
