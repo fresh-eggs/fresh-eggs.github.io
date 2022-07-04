@@ -1,30 +1,3 @@
-- record gifs of the debugger hitting breakpoint for the executeCode routine
-    - you did this! Recorded the method being hit and the stepping into the code. At this point you would have explained _how_ you found the correct addresses for doexecutecode
-- record video of the POC working
-     - the roofgarden server just needs to be run and the hardware connected to it. Seems you still have the roofgarden client setup with the screen green payload. `xband_bootstrap_small` has the right build.
-- make a release of the emulator with changes to take a playerID
-- Continue adding  to and editing the content
-	- double check how msg dispatch works (is the dispatch vector the same for the OS and ServerTalk just with different offsets?)
-	- add the section about the two main bugs during development (non-block sockets and buffer overflow)
-	- add the brief section about failed bug hunting
-	- update the sections on code execution with new images (maybe a gif) and code snippets that demonstrate the actual payload you used to turn the screen green.
-
-finishing writing section on where you looked for bugs, put it before code execution section
-
-start moving all the content into liquid format and start rendering it locally
-
-update all the images and gifs
-
-re-read
-
-make a release ready version of the emulator
-
-.
----
- 
-
-
-
 Long before the advent of the modern internet, online gaming had a fractured but active community. One piece of hardware that made this possible on the Super Nintendo Entertainment System was the XBAND Video Game Modem.
 
 As someone very interested in the early internet, I thought it would be fun to dig into the XBAND and learn more about the cartridge. Originally interested in the device from a security perspective, this project quickly led to developing emulation support for the XBAND on SNES in addtion to figuring out a debugging environment.
