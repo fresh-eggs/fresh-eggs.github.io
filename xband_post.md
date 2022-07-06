@@ -105,14 +105,14 @@ In total this took a couple months of free time development with a number of int
 
 Having the original implementation on Genesis emulators done by @argirisan as a reference made all the difference and I doubt the project would be in this state without it.
 
-![emulate xband rom receiving bandwidth news](/assets/letsgooo.png)
+<img src="/assets/letsgooo.png" width="500" height="300">
+<img src="/assets/iconic.png" width="300" height="300">
 
-![iconic](/assets/iconic.png)
 
 
 ## How does XBAND Work
+<img src="/assets/xband_PCB.jpg" width="500" height="600">
 
-![XBAND PCB](/assets/xband_PCB.jpg)
 
 Now equipped with a functional debugging environment, I started digging into the XBAND source code that has found it's way onto the internet in order to understand exactly how it works.
 
@@ -123,13 +123,14 @@ The protocol of choice for the XBAND was the Apple Data Streaming Protocol or AD
 
 Packets are framed with a pre-pended null byte and a trailing `\x10\x03`. Packets also contain a CRC added prior to the trailing `\x10\x03`. The data is pre-pended with the ADSP header detailed below.
 
-![ADSP Header](/assets/adsp_header_docs.png)
+<img src="/assets/adsp_header_docs.png" width="500" height="500">
 
 The XBAND would consume these with the help of the Rockwell modem, de-frame and push the packet onto an appropriate OS-managed FIFO for consumption.
 
 
 Below is a screenshot with some packet details from my debug build of BSNES-PLUS which dumps each ADSP packet and parses them for printing.
-![ADSP ServerTalk Packet](/assets/adsp_degbug.png)
+
+<img src="/assets/adsp_degbug.png" width="800" height="400">
 
 If you're interested in learning more, PDF copies of the developer manuals for ADSP are still _very_ available online.
 
@@ -139,7 +140,7 @@ https://github.com/fresh-eggs/bsnes-plus/tree/xband_pkt_injection
 ### ServerTalk / GameTalk
 Networked communication on the XBAND ROM generally fits into two categories. ServerTalk and GameTalk.
 
-![ServerTalk and GameTalk](/assets/servertalk_and_gametalk.png)
+<img src="/assets/servertalk_and_gametalk.png" width="700" height="400">
 
 ServerTalk is the list of routines for managing Server to Client commands while the GameTalk layer denotes client to client transfers of data during gameplay.
 
@@ -376,7 +377,8 @@ The `$payload` variable contains the ADSP packet header, the ServerTalk opcode f
 `msExecuteCode` is listed as message ID `0x09` in the list I provided earlier and the source code expects to read a `long` value for the code size followed by the code itself.
 
 Below is out packet:
-![Packet Showing do execute code with payload](/assets/adsp_packet_for_do_execute_code_demo.png)
+
+<img src="/assets/adsp_packet_for_do_execute_code_demo.png" width="700" height="500">
 
 At this point, we should be able to set a breakpoint within `_ReceiveServerMessageDispatch` (`0xd5cbda`) and see if injecting this packet triggers the `kDispatcherVector` to resolve a processing routine for `msExecuteCode` messages.
 
@@ -385,7 +387,7 @@ Sure enough, we end up resolving to a routine that looks like `MessErr DoExecute
 
 I validated this by matching the structure of the XBAND OS function calls by OS Function ID between the source and the assmebly. We can see here a snippet from the assmebly:
 
-![assembly snippet from debugger showing DoExecuteCodeMessageOpCode](/assets/do_execute_code_asm.png)
+<img src="/assets/do_execute_code_asm.png" width="400" height="400">
 
 We can validate that the OS function calls provided to the `kDispatcherVector` match between the source code and the assembly. (using the OS Function lookup table I provided earlier.)
 
@@ -433,10 +435,9 @@ messageCodeProcPtr	myCodeProc;
 ```
 
 
-If we're are correct, it follows that we should jump to the function pointer containing our code to be executed at some point and indeed we do:
-![this is the program counter moving to what looks like our provided instructions](xband__hit_do_execute_code_payload.gif)
+If we're are correct, it follows that we should jump to the function pointer containing our code to be executed at some point and indeed we do. Note that `0xEA` is a NOP on the 65C816.
+![this is the program counter moving to what looks like our provided instructions](/assets/xband__hit_do_execute_code_payload.gif)
 
-![debugger_breakpoint_execute_code](/assets/bytes.png)
 
 Very cool!
 
@@ -528,7 +529,7 @@ autoload = yes
 
 Once everything was setup all we had to do was dial the XBAND Network and our `msExecuteCode` packet should be injected. If this feature really does exist on retail cartridges, the payload should execute.
 
-[video of the POC]
+https://raw.githubusercontent.com/fresh-eggs/fresh-eggs.github.io/master/assets/xbandpoc.mp4
 
 I've never been so excited for a shade of green in my life.
 
