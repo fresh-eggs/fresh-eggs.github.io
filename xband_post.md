@@ -531,8 +531,8 @@ Once everything was setup all we had to do was dial the XBAND Network and our `m
 
 
 
-https://user-images.githubusercontent.com/7784322/177585366-c2f7642c-76e3-491a-918f-b062d1582f5b.mp4
-
+<video src="https://user-images.githubusercontent.com/7784322/177585366-c2f7642c-76e3-491a-918f-b062d1582f5b.mp4">
+</video>
 
 
 I've never been so excited for a shade of green in my life.
