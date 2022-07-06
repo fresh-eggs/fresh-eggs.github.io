@@ -529,7 +529,11 @@ autoload = yes
 
 Once everything was setup all we had to do was dial the XBAND Network and our `msExecuteCode` packet should be injected. If this feature really does exist on retail cartridges, the payload should execute.
 
-https://raw.githubusercontent.com/fresh-eggs/fresh-eggs.github.io/master/assets/xbandpoc.mp4
+
+
+https://user-images.githubusercontent.com/7784322/177585366-c2f7642c-76e3-491a-918f-b062d1582f5b.mp4
+
+
 
 I've never been so excited for a shade of green in my life.
 
