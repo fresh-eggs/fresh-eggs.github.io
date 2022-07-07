@@ -1,13 +1,13 @@
 Long before the advent of the modern internet, online gaming had a fractured but active community. One piece of hardware that made this possible on the Super Nintendo Entertainment System was the XBAND Video Game Modem.
 
-After learning about the XBAND through the fantastic Wrestles With Gaming [Documentary](https://www.youtube.com/watch?v=k_5M-z_RUKA), I was initially interested in exploring the device from a security perspective. Doing so however quickly led to developing emulation support for the XBAND on SNES in addtion to a functional debugging environment.
+After learning about the XBAND through the fantastic Wrestles With Gaming [Documentary](https://www.youtube.com/watch?v=k_5M-z_RUKA), I was initially interested in exploring the device from a security perspective. Doing so however quickly led to developing emulation support for the XBAND on SNES in addition to a functional debugging environment.
 
 I've attempted to document what I learned along the way in the hopes that it serves as a reference for anyone else interested in exploring early internet hardware. 
 
 We'll be begin with covering how emulation support was implemented. Following this we'll dig into how the XBAND works and finish with how I was able to execute arbitrary code on my Super Nintendo, through a phone line, in the year 2022.
 
 ## XBAND (what is it even?)
-Xband, designed by Catapult Entertainment, was a video game modem for consoles of the early 90s. Efforts to revive the XBAND network have sprung up throughout the years by various groups. Most recently, @argirisan from the Retrocomputing network managed to develop and host a functional XBAND server. Details on this latest revival are available [here](https://xband.retrocomputing.network/).
+XBAND, designed by Catapult Entertainment, was a video game modem for consoles of the early 90s. Efforts to revive the XBAND network have sprung up throughout the years by various groups. Most recently, @argirisan from the Retrocomputing network managed to develop and host a functional XBAND server. Details on this latest revival are available [here](https://xband.retrocomputing.network/).
 
 <img src="/assets/xband_set.png" height="300px" width="300px" style="margin-left:auto;margin-right:auto;display:block;width:50%;">
 
@@ -20,7 +20,7 @@ Searching around for emulation support for XBAND on the SNES yielded few results
 
 With that in mind, I began looking for similar emulators with robust debugging. I eventually found the debug oriented fork of BSNES named [BSNES-PLUS](https://github.com/devinacker/bsnes-plus).
 
-I decided it would be worthwhile investing time both porting and finishing the work in BSNES-SX2 over to BSNES-PLUS. Getting the XBAND ROM booting in a debug oriented emulator and connecting to the retrocomputing XBAND server was worth doing for my project and for games preservation. The only thing standing in my way was that I had zero experience writting emulators.
+I decided it would be worthwhile investing time both porting and finishing the work in BSNES-SX2 over to BSNES-PLUS. Getting the XBAND ROM booting in a debug oriented emulator and connecting to the retrocomputing XBAND server was worth doing for my project and for games preservation. The only thing standing in my way was that I had zero experience writing emulators.
 
 
 ## Building emulation Support
@@ -106,7 +106,7 @@ uint8 XBANDBase::read(unsigned addr) {
 		}
 		[...]
 ```
-For more information on how to interface with the MMIO registers provided by the Rockwell Modem, please consult the following resources. The nocash SNES Hardware specifications contain more detailed infomation on calculating modem register offsets.
+For more information on how to interface with the MMIO registers provided by the Rockwell Modem, please consult the following resources. The nocash SNES Hardware specifications contain more detailed information on calculating modem register offsets.
 - [Table 3.1 in the Rockwell Modem Datasheet](/assets/RC2324DPL.pdf)
 - [The Rockwell Modem Designer's Guide](/assets/rockwell_modem_designer_guide.pdf)
 - [nocash SNES hardware specifications](http://problemkaputt.de/fullsnes.htm#snescartxbandiorockwellmodemports)
@@ -199,7 +199,7 @@ MessErr _ReceiveServerMessageDispatch( short opCode )
 }
 ```
 
-Below is a snippet of each of the documented ServerTalk MessageIDs expceted to have associated handlers (can you spot any spicy ones?):
+Below is a snippet of each of the documented ServerTalk MessageIDs expected to have associated handlers (can you spot any spicy ones?):
 
 ```C
 #define	kFirstServerMessage				1
@@ -303,7 +303,7 @@ DBGetItem					0xd07145
 ```
 
 
-## Remote Code Exectuion over the phone lines in 2022
+## Remote Code Execution Over a Phone Line in 2022
 
 After spending a month or so hunting for bugs, I found a few but unfortunately nothing practically exploitable (more on that later). At this point, I decided it was time to revisit an _interesting_ ServerTalk MessageID I found in the source code. The MessageID in question was `msExecuteCode`.
 
@@ -384,7 +384,7 @@ To do this, I put together a tool written in PHP based off the work in [Roofgard
 ?>
 ```
 
-The `$payload` variable contains the ADSP packet header, the ServerTalk opcode for `msExecuteCode` (`0x09`), a `long` representing the length of the instructions followed by the actual intructions. The tool will calculate the CRC in addition to adding the frame to the packet.
+The `$payload` variable contains the ADSP packet header, the ServerTalk opcode for `msExecuteCode` (`0x09`), a `long` representing the length of the instructions followed by the actual instructions. The tool will calculate the CRC in addition to adding the frame to the packet.
 
 
 Below is our completed packet:
@@ -399,7 +399,7 @@ The following is a gif of the debugger hitting the `0xd57c8b` breakpoint given a
 
 ![break on the address of DoExecuteCodeMessageOpCode](/assets/xband__hit_do_execute_code_method.gif)
 
-I validated this by comparing the the XBAND OS function calls happening in the source and in the assembly. We can see here a snippet from the assmebly:
+I validated this by comparing the the XBAND OS function calls happening in the source and in the assembly. We can see here a snippet from the assembly:
 
 <img src="/assets/do_execute_code_asm.png" width="400" height="400">
 
@@ -413,7 +413,7 @@ LDX  #$020b
 JSL  $e00040  (kDispatcherVector)
 ```
 
-These translate to `GetDataSync()` (`0x209`) and `GetDataError()` (`0x20b`) respectively. Going through the rest of the assembly, you'll find the other function calls match and the overal structure of the assembly instructions match what the source intends.
+These translate to `GetDataSync()` (`0x209`) and `GetDataError()` (`0x20b`) respectively. Going through the rest of the assembly, you'll find the other function calls match and the overall structure of the assembly instructions match what the source intends.
 ```C
 MessErr DoExecuteCodeMessageOpCode( void )
 {
@@ -463,7 +463,7 @@ This small program will reset the state of important control registers like the 
 
 There were many prior failed attempts at getting my routine working properly, most of them had to do with my failure to account for all relevant state registers.
 
-One other interesting constraint is the need for the payload to be position independent. There is no garuntee provided for the memory address our instructions are stored at as far as I can tell.
+One other interesting constraint is the need for the payload to be position independent. There is no guarantee provided for the memory address our instructions are stored at as far as I can tell.
 
 The following is our payload:
 ```
@@ -492,7 +492,7 @@ Start:
 
 MAIN:
   stz $2121               ;reset color palette register
-  lda #%00011111
+  lda #%00011111          ;color code for green
   sta $2122
   stz $2122
   lda #$0F
@@ -501,6 +501,8 @@ MAIN:
 
 .ENDS
 ```
+
+This payload should give us some visual feedback confirming that our payload runs by resetting some control registers and setting the screen green.
 
 ### Running the Payload on Real Hardware
 In order to deliver this packet to real hardware, I decided to get a copy of the Roofgarden server running locally.
@@ -556,8 +558,8 @@ I've never been so excited for a shade of green in my life.
 ## Bug Hunting
 As mentioned earlier, I had found a few issues but nothing exploitable. I wanted to document the areas I explored for anyone looking for a good place to start.
 
-### Overwritting Function Pointers in the DB
-The XBAND Modem builds a database of stored config information within SRAM. Some entries in this DB contain function pointers or contain the address of a routine. 
+### Overwriting Function Pointers in the DB
+The XBAND Modem builds a database of stored config information within SRAM. Some entries in this DB contain function pointers or contain the address of a routine to run when a particular state is reached. 
 
 There are a handful of ServerTalk messages that allow for you to modify DB entries:
 ```
@@ -569,7 +571,7 @@ There are a handful of ServerTalk messages that allow for you to modify DB entri
   msGetNextItemIDFromDB
 ```
 
-There are most likely some entries that you can overwrite wich persist a restart. You can like store payloads within X-Mail messages. I explored this with the `kSNESAudioDriverType` entry.
+There are most likely some entries that you can overwrite which persist a restart. You can likely store your payloads within X-Mail messages. I explored this with the `kSNESAudioDriverType` DB entry.
 
 
 
@@ -577,7 +579,7 @@ There are most likely some entries that you can overwrite wich persist a restart
 
 `short _PutByte(register ByteContext *bytxt, register const unsigned char byte)` has an issue where crafted input can result in a re-write of a single char 244 times. The impacted buffer is based on the X. I didn't dig too much into this but it didn't seem that useful.
 
-Given the following params, it looks like you set the `rleChar`, followed by writting it 244 times on the second call to `_PutByte`
+Given the following params, it looks like you set the `rleChar`, followed by writing it 244 times on the second call to `_PutByte`
 
 ```
 bufsize = 4
