@@ -393,7 +393,10 @@ Below is our completed packet:
 
 At this point, we should be able to set a breakpoint within `_ReceiveServerMessageDispatch` (`0xd5cbda`) and see if injecting this packet triggers the `kDispatcherVector` to resolve a processing routine for `msExecuteCode` messages.
 
-Sure enough, we end up resolving to a routine that looks like the `MessErr DoExecuteCodeMessageOpCode( void )` function found in the XBAND OS source:
+Sure enough, `_ReceiveServerMessageDispatch` ends up resolving to a routine that looks like the `MessErr DoExecuteCodeMessageOpCode( void )` function found in the XBAND OS source at `0xd57c8b`.
+
+The following is a gif of the debugger hitting the `0xd57c8b` breakpoint given an `msExecuteCode` message:
+
 ![break on the address of DoExecuteCodeMessageOpCode](/assets/xband__hit_do_execute_code_method.gif)
 
 I validated this by comparing the the XBAND OS function calls happening in the source and in the assembly. We can see here a snippet from the assmebly:
