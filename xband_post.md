@@ -617,4 +617,9 @@ Next up for this project would be to finish emulating gameplay. This would open 
 
 As mentioned, if you're interested in helping out with this effort please don't hesitate to get in touch with me (fresh-eggs) on the [retrocomputing discord](https://xband.retrocomputing.network/).
 
-On the github repository you'll find the packet injection oriented branch, the branch that began implementing gameplay support and the latest releases that provide fully emulated ServerTalk features and the ability to connect to the retrocomputingnetwork servers.
+On the github repository below you'll find three relevant branches
+- `xband_support`: The functional implementation used throughout this article.
+- `xband_pkt_injection`: Similar to the above branch with a few functions added to compile a new versions that can inject a given set of bytes.
+- `xband_gameplay`: Early stages of gameplay support.
+
+If you're interested in just getting a copy of the emulator running, `xband_support` is the branch to build. Reach out to us in the discord if you would like to connect to the retrocomputing servers.
