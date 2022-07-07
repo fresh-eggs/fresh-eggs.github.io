@@ -1,17 +1,17 @@
 Long before the advent of the modern internet, online gaming had a fractured but active community. One piece of hardware that made this possible on the Super Nintendo Entertainment System was the XBAND Video Game Modem.
 
-Initially interested in exploring the device from a security perspective, this project quickly led to developing emulation support for the XBAND on SNES in addtion to a functional debugging environment.
+After learning about the XBAND through the fantastic Wrestles With Gaming [Documentary](https://www.youtube.com/watch?v=k_5M-z_RUKA), I was initially interested in exploring the device from a security perspective. Doing so however quickly led to developing emulation support for the XBAND on SNES in addtion to a functional debugging environment.
 
-I've attempted to document what I learned along the way in the hopes that it serves as a reference for anyone euqally interested in the early internet. 
+I've attempted to document what I learned along the way in the hopes that it serves as a reference for anyone else interested in exploring early internet hardware. 
 
 We'll be begin with covering how emulation support was implemented. Following this we'll dig into how the XBAND works and finish with how I was able to execute arbitrary code on my Super Nintendo, through a phone line, in the year 2022.
 
 ## XBAND (what is it even?)
-Xband, designed by Catapult Entertainment, was a video game modem for consoles of the early 90s. Efforts to revive the XBAND network have sprung up throughout the years by various groups. Most recently, @argirisan from the Retrocomputing network managed to develop and host a functional XBAND server. Details on this latest revival are available [here](https://xband.retrocomputing.network/) and a highly recommended documentary by Wrestles with Gaming on the history of XBAND is availble [here](https://www.youtube.com/watch?v=k_5M-z_RUKA).
+Xband, designed by Catapult Entertainment, was a video game modem for consoles of the early 90s. Efforts to revive the XBAND network have sprung up throughout the years by various groups. Most recently, @argirisan from the Retrocomputing network managed to develop and host a functional XBAND server. Details on this latest revival are available [here](https://xband.retrocomputing.network/).
 
 <img src="/assets/xband_set.png" height="300px" width="300px" style="margin-left:auto;margin-right:auto;display:block;width:50%;">
 
-Having spent time [writing software for the SNES](https://github.com/fresh-eggs/snes-northsec-2021) for the [Northsec CTF](https://nsec.io/competition/) in 2021, I decided to make use of my SNES architecture literacy and spend time bug hunting on the XBAND for SNES.
+Having spent time [writing software for the SNES](https://github.com/fresh-eggs/snes-northsec-2021) for the [Northsec CTF](https://nsec.io/competition/) in 2021, I decided to make use of my SNES architecture literacy and spend time looking for memory safety issues on the XBAND for SNES.
 
 ## Designing a Debugging Environment
 In order to begin understanding how the XBAND works, I wanted to have a functional debug environment. I opted for a software based approach given the limited options available for hardware debugging on the SNES.
