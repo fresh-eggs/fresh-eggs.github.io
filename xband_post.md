@@ -1,3 +1,5 @@
+# Exploring the XBAND Video Game Modem and Excuting Arbitrary Code Over a Phone Line in 2022
+
 Long before the advent of the modern internet, online gaming had a fractured but active community. One piece of hardware that made this possible on the Super Nintendo Entertainment System was the XBAND Video Game Modem.
 
 After learning about the XBAND through the fantastic Wrestles With Gaming [Documentary](https://www.youtube.com/watch?v=k_5M-z_RUKA), I was initially interested in exploring the device from a security perspective. Doing so however quickly led to developing emulation support for the XBAND on SNES in addition to a functional debugging environment.
