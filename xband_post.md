@@ -86,8 +86,29 @@ For each operation in that range, we calculate an offset that gives us the relat
 Below is a snippet from the read hooks for the Rockwell MMIO ranges:
 
 ```C
-uint8 XBANDBase::read(unsigned addr) {
 
+struct XBANDState {
+	uint16_t cart_space[0x200000];
+	uint8_t regs[XBAND_REGS];
+	uint8_t kill;
+	uint8_t control;
+	struct sockaddr_in server;
+	int conn;
+	uint8_t modem_line_relay;
+	uint8_t modem_regs[0x20];
+	uint8_t modem_set_ATV25;
+	uint8_t net_step;
+	uint8_t rxbuf[16384];
+	uint32_t rxbufpos;
+	uint32_t rxbufused;
+	uint8_t txbuf[16384];
+	uint32_t txbufpos;
+	uint32_t txbufused;
+};
+
+XBANDBase::XBANDState *x;
+
+uint8 XBANDBase::read(unsigned addr) {
 	//0xFBC000 -- 0xFBFE00
 	if(within<0xfb, 0xfb, 0xc000, 0xfdff>(addr)) {
 		uint8 reg = (addr-0xFBC000)/2;
