@@ -50,7 +50,7 @@ The following are some of the relevant memory ranges for the XBAND ROM:
 (credits: https://problemkaputt.de/fullsnes.htm)
 
 Below is a snippet from the memory hooks that process reads to XBAND SRAM:
-```C
+```c++
 template<uint8 banklo, uint8 bankhi, uint16 addrlo, uint16 addrhi>
   alwaysinline bool within(unsigned addr) {
     static const unsigned lo = (banklo << 16) | addrlo;
@@ -85,8 +85,7 @@ For each operation in that range, we calculate an offset that gives us the relat
 
 Below is a snippet from the read hooks for the Rockwell MMIO ranges:
 
-```C
-
+```c++
 struct XBANDState {
 	uint16_t cart_space[0x200000];
 	uint8_t regs[XBAND_REGS];
@@ -190,7 +189,7 @@ The `_ReceiveServerMessageDispatch` function is responsible for consuming Server
 
 Below is a snippet of the C function `_ReceiveServerMessageDispatch`. It first loads the opCode (MessageID) into the `A` register followed by jumping to the address of the `kDispatcherVector` (the message dispatcher) in order to resolve where the handler is stored and transfer execution.
 
-```C
+```c++
 MessErr _ReceiveServerMessageDispatch( short opCode )
 {
 	opCodeProcPtr		opCodeProc;
@@ -223,7 +222,7 @@ MessErr _ReceiveServerMessageDispatch( short opCode )
 
 Below is a snippet of each of the documented ServerTalk MessageIDs expected to have associated handlers (can you spot any spicy ones?):
 
-```C
+```c++
 #define	kFirstServerMessage				1
 #define msEndOfStream					2
 #define	msGamePatch 					3
