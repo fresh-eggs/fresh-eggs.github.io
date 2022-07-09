@@ -291,7 +291,7 @@ The XBAND also appears to use the `kDispatcherVector` message dispatcher for XBA
 
 Below is a list I made of the XBAND SNES OS Function IDs that can be provided to the `kDispatcherVector` via the `X` register in order to resolve to the address of that function.
 
-[XBAND SNES OS Function IDs]()
+[XBAND SNES OS Function IDs](/assets/xband_snes_os_function_ids.pdf)
 
 
 ### List of symbols I collected.
