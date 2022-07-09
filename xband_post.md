@@ -146,7 +146,7 @@ Having the original implementation on the Genesis emulator done by @argirisan as
 
 Now equipped with a functional debugging environment, I started digging into the XBAND source code that has found it's way onto the internet in order to help understand exactly how it works.
 
-The Xband was designed to send controller inputs between connected clients through the XBAND network with the help of the Rockwell Modem. Similar in practice to a GameGenie, the XBAND OS would patch the ROM provided by the game cartridge inserted into it's slot with it's own instructions to capture and inject controller input. The very talented Catapult engineers would reverse engineer ROMS and write their own patches in order for a game to be supported.
+The Xband was designed to send controller inputs between connected clients through the XBAND network with the help of the Rockwell Modem. Similar in practice to a GameGenie, the XBAND OS would patch the ROM provided by the game cartridge with it's own instructions which capture and inject controller input. The very talented Catapult engineers would reverse engineer ROMS and write their own patches. These patches would get pushed out to the XBAND modems.
 
 <img src="/assets/xband_PCB.jpg" width="400" height="500">
 
