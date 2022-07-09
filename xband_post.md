@@ -27,7 +27,7 @@ I decided it would be worthwhile investing time porting and finishing the work i
 
 ## Building emulation Support
 
-### Memory Mapping on the SNES Figuring out SRAM
+### Memory Mapping on the SNES
 First up was getting the retail ROM to boot on BSNES-PLUS. This proved to be more tricky than I anticipated.
 
 The first step was getting the ROM mapped correctly into memory. Given proper memory mapping, we could add hooks into each read or write operation the ROM makes to the memory ranges used by XBAND. Once the hooks pass control to the emulator, we ensure our emulation updates all relevant state and control structures followed by returning control to the ROM.
