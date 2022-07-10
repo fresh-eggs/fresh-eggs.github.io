@@ -640,4 +640,5 @@ On the [github repository](https://github.com/fresh-eggs/bsnes-plus) you'll find
   - https://github.com/fresh-eggs/bsnes-plus/tree/xband_pkt_injection
 - `xband_gameplay`: Early stages of gameplay support.
   - https://github.com/fresh-eggs/bsnes-plus/tree/xband_gameplay
+
 If you're interested in just getting a copy of the emulator running, `xband_support` is the branch to build. Reach out to us in the discord if you would like to connect to the retrocomputing servers.
