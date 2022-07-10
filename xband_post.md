@@ -324,7 +324,7 @@ DBGetItem					0xd07145
 ```
 
 
-## Remote Code Execution Over a Phone Line in 2022
+## Arbitrary Code Execution on the SNES Over a Phone Line in 2022
 
 After spending a month or so hunting for bugs, I found a few but unfortunately nothing practically exploitable (more on that later). At this point, I decided it was time to revisit an _interesting_ ServerTalk MessageID I found in the source code. The MessageID in question was `msExecuteCode`.
 
@@ -420,7 +420,7 @@ The following is a gif of the debugger hitting the `0xd57c8b` breakpoint given a
 
 ![break on the address of DoExecuteCodeMessageOpCode](/assets/xband__hit_do_execute_code_method.gif)
 
-I validated this by comparing the the XBAND OS function calls happening in the source and in the assembly. We can see here a snippet from the assembly:
+I validated that we appear to resolve a routine that looks like the `DoExecuteCodeMessageOpCode` by comparing the XBAND OS function calls that occur within it both in the source and in the assembly. We can see here a snippet from the assembly:
 
 <img src="/assets/do_execute_code_asm.png" width="400" height="400">
 
@@ -528,7 +528,7 @@ This payload should give us some visual feedback confirming that our code runs b
 ### Running the Payload on Real Hardware
 In order to deliver this packet to real hardware, I decided to get a copy of the Roofgarden server running locally.
 
-To do this, I needed to setup my first Software PBX! For this I used `asterisk`. With the help of @argirisan I setup a simple profile to answer calls from the XBAND modem when it dials `1-800-207-1194` and routed them to my local copy of Roofgarden running on my laptop with the help of a [softmodem extension](https://github.com/proquar/asterisk-Softmodem).
+To do this, I needed to setup my first Software PBX! For this I used `asterisk`. With the help of @agirisan I setup a simple profile to answer calls from the XBAND modem when it dials `1-800-207-1194` and routed them to my local copy of Roofgarden running on my laptop with the help of a [softmodem extension](https://github.com/proquar/asterisk-Softmodem).
 
 Here are the `.conf` files I used for `asterisk` in order for anyone to set this up for themselves:
 ```
@@ -568,7 +568,7 @@ autoload = yes
 
 Once this was setup, all we had to do is dial the XBAND Network and our `msExecuteCode` packet should be injected thanks to my modified XBAND Server. If this feature really does exist on retail cartridges, the payload should execute.
 
-Below, you'll see my XBAND connected to my ATA. The laptop in the frame is running the modified verion of the Roofgarden XBAND server along with the software PBX to receive the call from the XBAND.
+Below, you'll see my XBAND connected to my ATA. The laptop in the frame is running the modified version of the Roofgarden XBAND server along with the software PBX (`asterisk`) which will receive the call from the XBAND.
 
 <video src="https://user-images.githubusercontent.com/7784322/177585366-c2f7642c-76e3-491a-918f-b062d1582f5b.mp4" controls="controls" style="max-width: 700px; max-height: 900px">
 </video>
@@ -598,16 +598,9 @@ There are most likely some entries that you can overwrite which persist a restar
 
 ### _PutByte
 
-`short _PutByte(register ByteContext *bytxt, register const unsigned char byte)` has an issue where crafted input can result in a re-write of a single char 244 times. The impacted buffer is based on the X. I didn't dig too much into this but it didn't seem that useful.
+`short _PutByte(register ByteContext *bytxt, register const unsigned char byte)` has an issue where crafted input can result in a re-write of a single char 244 times. I didn't dig too much into this but it didn't seem that useful.
 
-Given the following params, it looks like you set the `rleChar`, followed by writing it 244 times on the second call to `_PutByte`
-
-```
-bufsize = 4
-bytxt->rleFlag = 1,
-[kRLEescape, some_rle_char, 255]
-bytxt->rleState = 2,
-```
+Given a specific set of params, you can set the `rleChar`, followed by writing it 244 times on the second call to `_PutByte`
 
 ### ServerTalk Messages and Related Parsing Routines
 Originally I started with learning about all of the parsing routines involved in handling any of the following ServerTalk messages:
@@ -640,7 +633,7 @@ Next up for this project would be to finish emulating gameplay. This would open 
 
 As mentioned, if you're interested in helping out with this effort please don't hesitate to get in touch with me (fresh-eggs) on the [retrocomputing discord](https://xband.retrocomputing.network/).
 
-On the github repository below you'll find three relevant branches:
+On the [github repository](https://github.com/fresh-eggs/bsnes-plus) you'll find three relevant branches:
 - `xband_support`: The functional implementation used throughout this article.
   - https://github.com/fresh-eggs/bsnes-plus/tree/xband_support
 - `xband_pkt_injection`: Similar to the above branch with a few functions added to compile a new versions that can inject a given set of bytes.
