@@ -147,20 +147,20 @@ Now equipped with a functional debugging environment, I started digging into the
 
 The XBAND was designed to send controller inputs between connected clients through the XBAND network with the help of the Rockwell Modem. Similar in practice to a GameGenie, the XBAND OS would patch the ROM provided by the game cartridge with it's own instructions which capture and inject controller input. The very talented Catapult engineers would reverse engineer ROMS and write their own patches. These patches would get pushed out to the XBAND modems.
 
-<img src="/assets/xband_PCB.jpg" width="400" height="500" style="margin-left:auto;margin-right:auto;display:block;width:50%;">
+<img src="/assets/xband_PCB.jpg" style="margin-left:auto;margin-right:auto;display:block;width:auto;height:auto;max-width:80%;max-height:80%">
 
 ### ADSP
 The protocol of choice for the XBAND was the Apple Data Streaming Protocol or ADSP. ADSP was able to provide a basic session layer between two hosts.
 
 Packets are framed with a pre-pended null byte and a trailing `\x10\x03`. Packets also contain a CRC added prior to the trailing `\x10\x03`. The data section is pre-pended with the ADSP header detailed below.
 
-<img src="/assets/adsp_header_docs.png" width="500" height="500" style="margin-left:auto;margin-right:auto;display:block;width:50%;">
+<img src="/assets/adsp_header_docs.png" style="margin-left:auto;margin-right:auto;display:block;width:auto;height:auto;max-width:80%;max-height:80%">
 
 The XBAND would consume these with the help of the Rockwell modem, de-frame and push the packet onto an appropriate OS-managed FIFO for consumption.
 
 Below is a screenshot of a packet with included details taken from my debug build of BSNES-PLUS which dumps each ADSP packet and parses them for printing.
 
-<img src="/assets/adsp_degbug.png" width="800" height="400">
+<img src="/assets/adsp_degbug.png" style="width:auto;height:auto;max-width:80%;max-height:80%">
 
 If you're interested in learning more, PDF copies of the developer manuals for ADSP are still _very_ available online.
 
@@ -171,7 +171,7 @@ https://github.com/fresh-eggs/bsnes-plus/tree/xband_pkt_injection
 ### ServerTalk / GameTalk
 Networked communication on the XBAND ROM generally fits into two categories. ServerTalk and GameTalk.
 
-<img src="/assets/servertalk_and_gametalk.png" width="700" height="400">
+<img src="/assets/servertalk_and_gametalk.png" style="width:auto;height:auto;max-width:70%;max-height:70%">
 
 ServerTalk represents routines focused on managing server to client communication while the GameTalk layer focuses on client to client communitcation.
 
@@ -410,7 +410,7 @@ The `$payload` variable contains the ADSP packet header, the ServerTalk opcode f
 
 Below is our completed packet:
 
-<img src="/assets/adsp_packet_for_do_execute_code_demo.png" width="700" height="500">
+<img src="/assets/adsp_packet_for_do_execute_code_demo.png" style="width:auto;height:auto;max-width:70%;max-height:70%">
 
 At this point, we should be able to set a breakpoint within `_ReceiveServerMessageDispatch` (`0xd5cbda`) and see if injecting this packet triggers the `kDispatcherVector` to resolve a processing routine for `msExecuteCode` messages.
 
@@ -422,7 +422,7 @@ The following is a gif of the debugger hitting the `0xd57c8b` breakpoint given a
 
 I validated that we appear to resolve a routine that looks like the `DoExecuteCodeMessageOpCode` by comparing the XBAND OS function calls that occur within it both in the source and in the assembly. We can see here a snippet from the assembly:
 
-<img src="/assets/do_execute_code_asm.png" width="400" height="400">
+<img src="/assets/do_execute_code_asm.png" style="width:auto;height:auto;max-width:80%;max-height:80%">
 
 We can validate that the OS function calls provided to the `kDispatcherVector` match between the source code and the assembly using the OS Function lookup table I provided earlier.
 
@@ -570,7 +570,7 @@ Once this was setup, all we had to do is dial the XBAND Network and our `msExecu
 
 Below, you'll see my XBAND connected to my ATA. The laptop in the frame is running the modified version of the Roofgarden XBAND server along with the software PBX (`asterisk`) which will receive the call from the XBAND.
 
-<video src="https://user-images.githubusercontent.com/7784322/177585366-c2f7642c-76e3-491a-918f-b062d1582f5b.mp4" controls="controls" style="max-width: 700px; max-height: 900px">
+<video src="https://user-images.githubusercontent.com/7784322/177585366-c2f7642c-76e3-491a-918f-b062d1582f5b.mp4" controls="controls">
 </video>
 
 
