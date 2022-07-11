@@ -1,4 +1,4 @@
-# Exploring the XBAND Video Game Modem and Excuting Arbitrary Code Over a Phone Line in 2022
+# Exploring the XBAND Video Game Modem and Executing Arbitrary Code Over a Phone Line in 2022
 
 Long before the advent of the modern internet, online gaming had a fractured but active community. One piece of hardware that made this possible on the Super Nintendo Entertainment System was the XBAND Video Game Modem.
 
