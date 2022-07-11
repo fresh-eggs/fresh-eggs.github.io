@@ -11,7 +11,7 @@ We'll begin with covering how emulation support was implemented. Following this 
 ## XBAND (what is it even?)
 XBAND, designed by Catapult Entertainment, was a video game modem for consoles of the early 90s. Efforts to revive the XBAND network have sprung up throughout the years by various groups. Most recently, @agirisan from the Retrocomputing network managed to develop and host a functional XBAND server. Details on this latest revival are available [here](https://xband.retrocomputing.network/).
 
-<img src="/assets/xband_set.png" height="300px" width="300px" style="margin-left:auto;margin-right:auto;display:block;width:50%;">
+<img src="/assets/xband_set.png" style="margin-left:auto;margin-right:auto;display:block;width:auto;height:auto;max-width:100%;">
 
 Having spent time [writing software for the SNES](https://github.com/fresh-eggs/snes-northsec-2021) for the [Northsec CTF](https://nsec.io/competition/) in 2021, I decided it would be fun to make use of my SNES architecture literacy by spending time looking for memory safety issues on the XBAND for SNES.
 
