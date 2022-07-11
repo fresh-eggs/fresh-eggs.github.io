@@ -145,16 +145,16 @@ Having the original implementation on the Genesis emulator done by @agirisan as 
 
 Now equipped with a functional debugging environment, I started digging into the XBAND source code that has found it's way onto the internet in order to help understand exactly how it works.
 
-The Xband was designed to send controller inputs between connected clients through the XBAND network with the help of the Rockwell Modem. Similar in practice to a GameGenie, the XBAND OS would patch the ROM provided by the game cartridge with it's own instructions which capture and inject controller input. The very talented Catapult engineers would reverse engineer ROMS and write their own patches. These patches would get pushed out to the XBAND modems.
+The XBAND was designed to send controller inputs between connected clients through the XBAND network with the help of the Rockwell Modem. Similar in practice to a GameGenie, the XBAND OS would patch the ROM provided by the game cartridge with it's own instructions which capture and inject controller input. The very talented Catapult engineers would reverse engineer ROMS and write their own patches. These patches would get pushed out to the XBAND modems.
 
-<img src="/assets/xband_PCB.jpg" width="400" height="500">
+<img src="/assets/xband_PCB.jpg" width="400" height="500" style="margin-left:auto;margin-right:auto;display:block;width:50%;">
 
 ### ADSP
 The protocol of choice for the XBAND was the Apple Data Streaming Protocol or ADSP. ADSP was able to provide a basic session layer between two hosts.
 
 Packets are framed with a pre-pended null byte and a trailing `\x10\x03`. Packets also contain a CRC added prior to the trailing `\x10\x03`. The data section is pre-pended with the ADSP header detailed below.
 
-<img src="/assets/adsp_header_docs.png" width="500" height="500">
+<img src="/assets/adsp_header_docs.png" width="500" height="500" style="margin-left:auto;margin-right:auto;display:block;width:50%;">
 
 The XBAND would consume these with the help of the Rockwell modem, de-frame and push the packet onto an appropriate OS-managed FIFO for consumption.
 
@@ -187,7 +187,7 @@ For those less familiar with message dispatching, think of it as an array of fun
 
 The `_ReceiveServerMessageDispatch` function is responsible for consuming ServerTalk messages. Given a set of parameters, it sets up a call to the `kDispatcherVector` which determines the relative address of the parsing routine that corresponds to the MessageID in question.
 
-Below is a snippet of the C function `_ReceiveServerMessageDispatch`. It first loads the opCode (MessageID) into the `A` register followed by jumping to the address of the `kDispatcherVector` (the message dispatcher) in order to resolve where the handler is stored and transfer execution.
+Below is a snippet of the C function `_ReceiveServerMessageDispatch`. It first loads the opCode (MessageID) into the `A` register followed by jumping to the address of the `kDispatcherVector` (the message dispatcher) in order to resolve where the handler is stored and transfers execution.
 
 ```c++
 MessErr _ReceiveServerMessageDispatch( short opCode )
@@ -331,7 +331,7 @@ After spending a month or so hunting for bugs, I found a few but unfortunately n
 ### msExecuteCode
 Initially I thought this couldn't possibly be in the retail release right? Let's find out!
 
-Leveraging the packet injection function I added to the emulator, I built a ServerTalk packet intended to trigger an `msExecuteCode`.
+Leveraging the packet injection function I added to the emulator, I built a ServerTalk packet intended to trigger a `msExecuteCode`.
 
 To do this, I put together a tool written in PHP based off the work in [Roofgarden](https://git.agiri.ninja/retrocomputingnetwork/roofgarden) done by @agirisan to quickly frame a valid ADSP packet given ADSP data:
 
@@ -416,7 +416,7 @@ At this point, we should be able to set a breakpoint within `_ReceiveServerMessa
 
 Sure enough, `_ReceiveServerMessageDispatch` ends up resolving to a routine that looks like the `MessErr DoExecuteCodeMessageOpCode( void )` function found in the XBAND OS source at `0xd57c8b`.
 
-The following is a gif of the debugger hitting the `0xd57c8b` breakpoint given an `msExecuteCode` message:
+The following is a gif of the debugger hitting the `0xd57c8b` breakpoint given a `msExecuteCode` message:
 
 ![break on the address of DoExecuteCodeMessageOpCode](/assets/xband__hit_do_execute_code_method.gif)
 
